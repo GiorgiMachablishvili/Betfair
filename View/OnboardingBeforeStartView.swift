@@ -10,6 +10,7 @@ import SnapKit
 
 class OnboardingBeforeStartView: UIView {
 
+    var didPressAcceptButton: (() -> Void)?
     var didPressCloseButton: (() -> Void)?
 
     private lazy var viewMainBackground: UIView = {
@@ -42,13 +43,43 @@ class OnboardingBeforeStartView: UIView {
         return view
     }()
 
-    private lazy var beforeStartInfo: UILabel = {
-        let view = UILabel(frame: .zero)
-        view.text = "By clicking the 'Accept' button, I confirm that I have read and accept the Privacy Policy and Terms of Use."
-        view.textColor = UIColor.blackColor
-        view.font = UIFont.poppinsRegular(size: 14)
+    private lazy var termsPrivacyTextView: UITextView = {
+        let view = UITextView()
+        view.isEditable = false
+        view.isScrollEnabled = false
+        view.backgroundColor = .clear
         view.textAlignment = .center
-        view.numberOfLines = 3
+        view.delegate = self
+        view.textContainerInset = .zero
+        view.textContainer.lineFragmentPadding = 0
+        view.linkTextAttributes = [
+            .foregroundColor: UIColor.blackColor,
+            .underlineStyle: NSUnderlineStyle.single.rawValue
+        ]
+
+        let fullText = "By clicking the 'Accept' button, I confirm that I have read and accept the Privacy Policy and Terms of Use."
+
+        let privacyPolicyText = "Privacy Policy"
+        let termsOfUseText = "Terms of Use"
+
+        let attributedString = NSMutableAttributedString(string: fullText, attributes: [
+            .font: UIFont.poppinsRegular(size: 14),
+            .foregroundColor: UIColor.blackColor
+        ])
+
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.alignment = .center
+        paragraphStyle.lineSpacing = 4
+
+        attributedString.addAttribute(.paragraphStyle, value: paragraphStyle, range: NSMakeRange(0, fullText.count))
+
+        let privacyPolicyRange = (fullText as NSString).range(of: privacyPolicyText)
+        let termsOfUseRange = (fullText as NSString).range(of: termsOfUseText)
+
+        attributedString.addAttribute(.link, value: "privacyPolicy", range: privacyPolicyRange)
+        attributedString.addAttribute(.link, value: "termsOfUse", range: termsOfUseRange)
+
+        view.attributedText = attributedString
         return view
     }()
 
@@ -89,7 +120,7 @@ class OnboardingBeforeStartView: UIView {
         addSubview(beforeStartBackground)
         addSubview(beforeStartImage)
         addSubview(beforeStartTitle)
-        addSubview(beforeStartInfo)
+        addSubview(termsPrivacyTextView)
         addSubview(acceptButton)
         addSubview(closeButton)
     }
@@ -118,7 +149,7 @@ class OnboardingBeforeStartView: UIView {
             make.height.equalTo(36 * Constraint.yCoeff)
         }
 
-        beforeStartInfo.snp.remakeConstraints { make in
+        termsPrivacyTextView.snp.remakeConstraints { make in
             make.top.equalTo(beforeStartTitle.snp.bottom)
             make.leading.trailing.equalToSuperview().inset(20 * Constraint.xCoeff)
         }
@@ -138,12 +169,30 @@ class OnboardingBeforeStartView: UIView {
 
 
     @objc private func clickAcceptButton() {
-        print("press accept button")
-
+        didPressAcceptButton?()
     }
 
     @objc private func clickCloseButton() {
         didPressCloseButton?()
-        print( "press close button")
+    }
+}
+
+extension OnboardingBeforeStartView: UITextViewDelegate {
+    func textView(_ textView: UITextView, shouldInteractWith URL: URL, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
+        if URL.absoluteString == "privacyPolicy" {
+            openPrivacyPolicy()
+        } else if URL.absoluteString == "termsOfUse" {
+            openTermsOfUse()
+        }
+        return false
+    }
+
+    //TODO: add links
+    private func openPrivacyPolicy() {
+        print("Privacy Policy Clicked")
+    }
+
+    private func openTermsOfUse() {
+        print("Terms of Use Clicked")
     }
 }
