@@ -67,7 +67,7 @@ class TimerView: UIView {
         return view
     }()
 
-    private lazy var startButton: UIButton = {
+    lazy var startButton: UIButton = {
         let view = UIButton(frame: .zero)
         view.setTitle("Start", for: .normal)
         view.backgroundColor = UIColor.mainViewsBackgroundYellow

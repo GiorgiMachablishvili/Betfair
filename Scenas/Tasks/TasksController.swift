@@ -35,6 +35,9 @@ class TasksController: UIViewController {
 
     private lazy var timerView: TimerView = {
         let view = TimerView()
+        view.didPressStartedButton = { [weak self] in
+            self?.startCountdown()
+        }
         view.isHidden = true
         return view
     }()
@@ -92,6 +95,45 @@ class TasksController: UIViewController {
             timerView.workoutTitle.text = selectedWorkout.title
             timerView.workoutDescription.text = "\(selectedWorkout.description) (\(selectedWorkout.duration) sec)"
             timerView.workoutNumberLabel.text = "\(selectedWorkout.duration) Sec"
+        }
+    }
+
+    private func startCountdown() {
+        timerView.startButton.setTitle("Reinvented", for: .normal)
+        timerView.startButton.isUserInteractionEnabled = false
+        timerView.startButton.backgroundColor = UIColor.mainViewsBackgroundYellow.withAlphaComponent(0.3)
+        let countdownNumbers = ["3", "2", "1", "GO"]
+        var index = 0
+
+        Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
+            if index < countdownNumbers.count {
+                self.timerView.workoutNumberLabel.text = countdownNumbers[index]
+                index += 1
+            } else {
+                timer.invalidate()
+                self.startWorkoutTimer()
+            }
+        }
+    }
+
+    private func startWorkoutTimer() {
+        timerView.startButton.isUserInteractionEnabled = true
+        timerView.startButton.backgroundColor = UIColor.mainViewsBackgroundYellow
+
+        guard let durationText = timerView.workoutNumberLabel.text?.components(separatedBy: " ").first,
+              let duration = Int(durationText) else { return }
+
+        var timeRemaining = duration
+        timerView.workoutNumberLabel.text = "\(timeRemaining)"
+
+        Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
+            if timeRemaining > 0 {
+                timeRemaining -= 1
+                self.timerView.workoutNumberLabel.text = "\(timeRemaining)"
+            } else {
+                timer.invalidate()
+                self.timerView.workoutNumberLabel.text = "Completed!"
+            }
         }
     }
 }
