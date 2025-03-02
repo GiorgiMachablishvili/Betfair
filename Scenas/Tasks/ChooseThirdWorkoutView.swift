@@ -1,17 +1,14 @@
 //
-//  ChooseWorkoutView.swift
+//  ChooseThirdWorkoutView.swift
 //  Betfair
 //
-//  Created by Gio's Mac on 01.03.25.
+//  Created by Gio's Mac on 02.03.25.
 //
 
 import UIKit
 import SnapKit
 
-class ChooseFirstWorkoutView: UIView {
-
-    var didPressGetStartedButton: (() -> Void)?
-
+class ChooseThirdWorkoutView: UIView {
     private lazy var workoutBackground: UIView = {
         let view = UIView(frame: .zero)
         view.backgroundColor = .whiteColor
@@ -29,14 +26,14 @@ class ChooseFirstWorkoutView: UIView {
 
     private lazy var workoutNumberLabel: UILabel = {
         let view = UILabel(frame: .zero)
-        view.text = "1"
+        view.text = "3"
         view.textColor = UIColor.whiteColor
         view.font = UIFont.poppinsBold(size: 40)
         view.textAlignment = .center
         return view
     }()
 
-    lazy var workoutTitle: UILabel = {
+    private lazy var workoutTitle: UILabel = {
         let view = UILabel(frame: .zero)
         view.text = "Balance on one leg"
         view.textColor = UIColor.blackColor
@@ -161,18 +158,18 @@ class ChooseFirstWorkoutView: UIView {
 
         return attributedString
     }
-    
+
     private func loadRandomWorkout() {
-        guard let randomWorkout = workouts.randomElement() else { return }
-        workoutTitle.text = randomWorkout.title
-        workoutDescription.text = "\(randomWorkout.description) (\(randomWorkout.duration) sec)"
-    }
+            guard let randomWorkout = workouts.randomElement() else { return }
+            workoutTitle.text = randomWorkout.title
+            workoutDescription.text = "\(randomWorkout.description) (\(randomWorkout.duration) sec)"
+        }
 
     @objc private func clickChangeButton() {
         loadRandomWorkout()
     }
 
     @objc private func clickGetStartedButton() {
-        didPressGetStartedButton?()
+
     }
 }
