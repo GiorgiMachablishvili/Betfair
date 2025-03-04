@@ -49,6 +49,9 @@ class Onboarding: UIViewController {
     private lazy var beforeStartView: OnboardingBeforeStartView = {
         let view = OnboardingBeforeStartView()
         view.isHidden = true
+        view.didPressAcceptButton = { [weak self] in
+            self?.acceptAndGoTabController()
+        }
         view.didPressCloseButton = { [weak self] in
             self?.hideBeforeStartView()
         }
@@ -108,6 +111,11 @@ class Onboarding: UIViewController {
         beforeStartView.snp.remakeConstraints { make in
             make.edges.equalToSuperview()
         }
+    }
+
+    private func acceptAndGoTabController() {
+        let tabBarController = TabController()
+        navigationController?.pushViewController(tabBarController, animated: true)
     }
 
     private func hideBeforeStartView() {

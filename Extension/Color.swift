@@ -14,6 +14,8 @@ extension UIColor {
 
     static let blackColor = UIColor(hexString: "#000000")
 
+    static let gayBackground = UIColor(hexString: "#191919")
+
 
 
 
