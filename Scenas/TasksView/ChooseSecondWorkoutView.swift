@@ -1,5 +1,5 @@
 //
-//  ChooseThirdWorkoutView.swift
+//  ChooseSecondWorkoutView.swift
 //  Betfair
 //
 //  Created by Gio's Mac on 02.03.25.
@@ -8,7 +8,10 @@
 import UIKit
 import SnapKit
 
-class ChooseThirdWorkoutView: UIView {
+class ChooseSecondWorkoutView: UIView {
+
+    var didPressGetStartedButton: (() -> Void)?
+
     private lazy var workoutBackground: UIView = {
         let view = UIView(frame: .zero)
         view.backgroundColor = .whiteColor
@@ -24,16 +27,16 @@ class ChooseThirdWorkoutView: UIView {
         return view
     }()
 
-    private lazy var workoutNumberLabel: UILabel = {
+    lazy var workoutNumberLabel: UILabel = {
         let view = UILabel(frame: .zero)
-        view.text = "3"
+        view.text = "2"
         view.textColor = UIColor.whiteColor
         view.font = UIFont.poppinsBold(size: 40)
         view.textAlignment = .center
         return view
     }()
 
-    private lazy var workoutTitle: UILabel = {
+    lazy var workoutTitle: UILabel = {
         let view = UILabel(frame: .zero)
         view.text = "Balance on one leg"
         view.textColor = UIColor.blackColor
@@ -170,6 +173,6 @@ class ChooseThirdWorkoutView: UIView {
     }
 
     @objc private func clickGetStartedButton() {
-
+        didPressGetStartedButton?()
     }
 }

@@ -1,5 +1,5 @@
 //
-//  TimerView.swift
+//  ChooseThirdWorkoutView.swift
 //  Betfair
 //
 //  Created by Gio's Mac on 02.03.25.
@@ -8,23 +8,9 @@
 import UIKit
 import SnapKit
 
-class TimerView: UIView {
+class ChooseThirdWorkoutView: UIView {
 
-    var didPressStartedButton: (() -> Void)?
-
-    private lazy var viewMainBackground: UIView = {
-        let view = UIView(frame: .zero)
-        view.backgroundColor = .clear.withAlphaComponent(0.3)
-        view.isUserInteractionEnabled = true
-        return view
-    }()
-
-    private lazy var workoutBackgroundCircle: UIImageView = {
-        let view = UIImageView(frame: .zero)
-        view.image = UIImage(named: "yellowCircle")
-        view.contentMode = .scaleAspectFit
-        return view
-    }()
+    var didPressGetStartedButton: (() -> Void)?
 
     private lazy var workoutBackground: UIView = {
         let view = UIView(frame: .zero)
@@ -43,9 +29,9 @@ class TimerView: UIView {
 
     lazy var workoutNumberLabel: UILabel = {
         let view = UILabel(frame: .zero)
-        view.text = "1"
+        view.text = "3"
         view.textColor = UIColor.whiteColor
-        view.font = UIFont.poppinsBold(size: 24)
+        view.font = UIFont.poppinsBold(size: 40)
         view.textAlignment = .center
         return view
     }()
@@ -67,25 +53,25 @@ class TimerView: UIView {
         return view
     }()
 
-    lazy var startButton: UIButton = {
+    private lazy var changeButton: UIButton = {
         let view = UIButton(frame: .zero)
-        view.setTitle("Start", for: .normal)
+        view.setTitle("change", for: .normal)
+        view.backgroundColor = UIColor.blackColor
+        view.titleLabel?.font = UIFont.poppinsMedium(size: 14)
+        view.setTitleColor(UIColor.whiteColor, for: .normal)
+        view.makeRoundCorners(24)
+        view.addTarget(self, action: #selector(clickChangeButton), for: .touchUpInside)
+        return view
+    }()
+
+    private lazy var getStartedButton: UIButton = {
+        let view = UIButton(frame: .zero)
+        view.setTitle("Get started", for: .normal)
         view.backgroundColor = UIColor.mainViewsBackgroundYellow
         view.titleLabel?.font = UIFont.poppinsMedium(size: 14)
         view.setTitleColor(UIColor.whiteColor, for: .normal)
         view.makeRoundCorners(24)
-        view.addTarget(self, action: #selector(clickStartedButton), for: .touchUpInside)
-        return view
-    }()
-
-    private lazy var closeButton: UIButton = {
-        let view = UIButton(frame: .zero)
-        view.setTitle("Close", for: .normal)
-        view.backgroundColor = UIColor.whiteColor
-        view.titleLabel?.font = UIFont.poppinsMedium(size: 14)
-        view.setTitleColor(UIColor.blackColor, for: .normal)
-        view.makeRoundCorners(24)
-        view.addTarget(self, action: #selector(clickCloseButton), for: .touchUpInside)
+        view.addTarget(self, action: #selector(clickGetStartedButton), for: .touchUpInside)
         return view
     }()
 
@@ -93,6 +79,7 @@ class TimerView: UIView {
         super.init(frame: frame)
         setup()
         setupConstraints()
+        loadRandomWorkout()
     }
 
     required init?(coder: NSCoder) {
@@ -100,31 +87,18 @@ class TimerView: UIView {
     }
 
     private func setup() {
-        addSubview(viewMainBackground)
         addSubview(workoutBackground)
-        addSubview(workoutBackgroundCircle)
         addSubview(workoutNumberView)
         addSubview(workoutNumberLabel)
         addSubview(workoutTitle)
         addSubview(workoutDescription)
-        addSubview(startButton)
-        addSubview(closeButton)
+        addSubview(changeButton)
+        addSubview(getStartedButton)
     }
 
     private func setupConstraints() {
-        viewMainBackground.snp.remakeConstraints { make in
-            make.edges.equalToSuperview()
-        }
-
         workoutBackground.snp.makeConstraints { make in
-            make.top.equalTo(viewMainBackground.snp.top).offset(355 * Constraint.yCoeff)
-            make.leading.trailing.equalToSuperview().inset(16 * Constraint.xCoeff)
-            make.height.equalTo(389 * Constraint.yCoeff)
-        }
-
-        workoutBackgroundCircle.snp.remakeConstraints { make in
-            make.center.equalTo(workoutNumberView)
-            make.height.width.equalTo(140 * Constraint.yCoeff)
+            make.edges.equalToSuperview()
         }
 
         workoutNumberView.snp.remakeConstraints { make in
@@ -148,22 +122,23 @@ class TimerView: UIView {
             make.leading.trailing.equalToSuperview().inset(20 * Constraint.xCoeff)
         }
 
-        startButton.snp.remakeConstraints { make in
+        changeButton.snp.remakeConstraints { make in
             make.bottom.equalTo(workoutBackground.snp.bottom).offset(-20 * Constraint.yCoeff)
-            make.trailing.equalTo(workoutBackground.snp.trailing).offset(-20 * Constraint.xCoeff)
+            make.leading.equalTo(workoutBackground.snp.leading).offset(20 * Constraint.xCoeff)
             make.height.equalTo(60 * Constraint.yCoeff)
-            make.width.equalTo(318 * Constraint.xCoeff)
+            make.width.equalTo(155 * Constraint.xCoeff)
         }
 
-        closeButton.snp.remakeConstraints { make in
-            make.top.equalTo(workoutBackground.snp.bottom).offset(8 * Constraint.yCoeff)
-            make.leading.trailing.equalToSuperview().inset(16 * Constraint.xCoeff)
+        getStartedButton.snp.remakeConstraints { make in
+            make.centerY.equalTo(changeButton)
+            make.trailing.equalTo(workoutBackground.snp.trailing).offset(-20 * Constraint.xCoeff)
             make.height.equalTo(60 * Constraint.yCoeff)
+            make.width.equalTo(155 * Constraint.xCoeff)
         }
     }
 
-    func makeTopViewAttributedString(for time: String) -> NSAttributedString {
-        let text = "Hold your balance for \(time.lowercased()) seconds"
+    func makeTopViewAttributedString(for sport: String) -> NSAttributedString {
+        let text = "Hold your balance for \(sport.lowercased()) seconds"
         let attributedString = NSMutableAttributedString(string: text)
 
         let completedRange = (text as NSString).range(of: "Hold your balance for ")
@@ -172,7 +147,7 @@ class TimerView: UIView {
             .font: UIFont.poppinsThin(size: 14)
         ], range: completedRange)
 
-        let sportRange = (text as NSString).range(of: time.lowercased())
+        let sportRange = (text as NSString).range(of: sport.lowercased())
         attributedString.addAttributes([
             .foregroundColor: UIColor.blackColor,
             .font: UIFont.poppinsThin(size: 14)
@@ -187,11 +162,17 @@ class TimerView: UIView {
         return attributedString
     }
 
-    @objc private func clickStartedButton() {
-        didPressStartedButton?()
+    private func loadRandomWorkout() {
+            guard let randomWorkout = workouts.randomElement() else { return }
+            workoutTitle.text = randomWorkout.title
+            workoutDescription.text = "\(randomWorkout.description) (\(randomWorkout.duration) sec)"
+        }
+
+    @objc private func clickChangeButton() {
+        loadRandomWorkout()
     }
 
-    @objc private func clickCloseButton() {
-
+    @objc private func clickGetStartedButton() {
+        didPressGetStartedButton?()
     }
 }
