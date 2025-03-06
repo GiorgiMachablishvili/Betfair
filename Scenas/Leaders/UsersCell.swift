@@ -177,9 +177,20 @@ class UsersCell: UICollectionViewCell {
         }
     }
 
-    func configuration(with data: UserInfo) {
+    func configuration(with data: UserInfo, rank: Int) {
         userImage.image = UIImage(named: "\(data.image)")
         userNameLabel.text = data.userName
         pointsLabeL.text = data.userRating
+        numberingLabel.text = "\(rank)"
+
+        if rank <= 3 {
+            numberingBackGroundView.backgroundColor = .mainViewsBackgroundYellow
+            numberingMark.textColor = .whiteColor
+            numberingLabel.textColor = .whiteColor
+        } else {
+            numberingBackGroundView.backgroundColor = .clear
+            numberingMark.textColor = .blackColor
+            numberingLabel.textColor = .blackColor
+        }
     }
 }

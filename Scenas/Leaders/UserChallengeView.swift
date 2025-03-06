@@ -204,6 +204,7 @@ class UserChallengeView: UIView {
         didPressComplainButton?()
     }
 
+    //TODO: send challenge for user
     @objc private func clickChallengeButton() {
 
     }

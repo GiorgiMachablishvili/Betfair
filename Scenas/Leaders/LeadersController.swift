@@ -5,10 +5,13 @@ import SnapKit
 
 class LeadersController: UIViewController {
 
-    private let users: [UserInfo] = [
+    private var users: [UserInfo] = [
         UserInfo(image: "user1", userName: "Alice", userRating: "1200"),
         UserInfo(image: "user2", userName: "Bob", userRating: "1500"),
-        UserInfo(image: "user3", userName: "Charlie", userRating: "1800")
+        UserInfo(image: "user3", userName: "Charlie", userRating: "1800"),
+        UserInfo(image: "user4", userName: "Tom", userRating: "900"),
+        UserInfo(image: "user5", userName: "Non", userRating: "1000"),
+        UserInfo(image: "user6", userName: "Tat", userRating: "700")
     ]
 
     private var filteredUsers: [UserInfo] = []
@@ -20,7 +23,6 @@ class LeadersController: UIViewController {
         layout.scrollDirection = .horizontal
         layout.itemSize = CGSize(width: view.frame.width, height: 70 * Constraint.yCoeff)
         layout.minimumLineSpacing = 4
-        //        layout.sectionInset = UIEdgeInsets(top: 0, left: 0, bottom: 10 * Constraint.yCoeff, right: 0)
         let view = UICollectionView(frame: .zero, collectionViewLayout: layout)
         view.backgroundColor = .clear
         view.showsHorizontalScrollIndicator = false
@@ -64,6 +66,7 @@ class LeadersController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .mainViewsBackgroundYellow
 
+        users.sort { Int($0.userRating) ?? 0 > Int($1.userRating) ?? 0 }
         filteredUsers = users
 
         setup()
@@ -128,8 +131,9 @@ extension LeadersController: UICollectionViewDelegate, UICollectionViewDataSourc
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "UsersCell", for: indexPath) as? UsersCell else {
             return UICollectionViewCell()
         }
-        let userInfo = filteredUsers[indexPath.item] // 🔹 Use filtered list
-        cell.configuration(with: userInfo)
+
+        let userInfo = filteredUsers[indexPath.item]
+        cell.configuration(with: userInfo, rank: indexPath.item + 1)
         return cell
     }
 
