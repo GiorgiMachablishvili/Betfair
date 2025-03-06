@@ -5,10 +5,10 @@ import SnapKit
 
 class LeadersController: UIViewController {
 
-    private let users: [ChallengeUserInfo] = [
-        ChallengeUserInfo(image: "user1", userName: "Alice", userRating: "1200"),
-        ChallengeUserInfo(image: "user2", userName: "Bob", userRating: "1500"),
-        ChallengeUserInfo(image: "user3", userName: "Charlie", userRating: "1800")
+    private let users: [UserInfo] = [
+        UserInfo(image: "user1", userName: "Alice", userRating: "1200"),
+        UserInfo(image: "user2", userName: "Bob", userRating: "1500"),
+        UserInfo(image: "user3", userName: "Charlie", userRating: "1800")
     ]
 
 
@@ -68,19 +68,20 @@ class LeadersController: UIViewController {
             make.edges.equalToSuperview()
         }
     }
-
 }
 
 
 extension LeadersController: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 3
+        return users.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "UsersCell", for: indexPath) as? UsersCell else {
             return UICollectionViewCell()
         }
+        let userInfo = users[indexPath.item]
+        cell.configuration(with: userInfo)
         return cell
     }
 

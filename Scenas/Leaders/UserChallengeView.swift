@@ -73,8 +73,10 @@ class UserChallengeView: UIView {
 
     lazy var complaintButton: UIButton = {
         let view = UIButton(frame: .zero)
-        view.setImage(UIImage(named: "complaint"), for: .normal)
-        view.backgroundColor = UIColor.whiteColor.withAlphaComponent(0.25)
+        let originalImage = UIImage(named: "complaint")
+        let resizedImage = originalImage?.resized(to: CGSize(width: 18, height: 20))
+        view.setImage(resizedImage, for: .normal)
+        view.backgroundColor = .blackColor.withAlphaComponent(0.1)
         view.makeRoundCorners(24)
         view.addTarget(self, action: #selector(clickComplaintButton), for: .touchUpInside)
         return view
@@ -207,4 +209,14 @@ class UserChallengeView: UIView {
 
     }
 
+}
+
+extension UIImage {
+    func resized(to size: CGSize) -> UIImage? {
+        UIGraphicsBeginImageContextWithOptions(size, false, UIScreen.main.scale)
+        draw(in: CGRect(origin: .zero, size: size))
+        let resizedImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        return resizedImage
+    }
 }

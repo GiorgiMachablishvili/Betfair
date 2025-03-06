@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct ChallengeUserInfo: Codable {
+struct UserInfo: Codable {
     let image: String
     let userName: String
     let userRating: String

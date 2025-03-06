@@ -176,4 +176,10 @@ class UsersCell: UICollectionViewCell {
             make.height.width.equalTo(20 * Constraint.yCoeff)
         }
     }
+
+    func configuration(with data: UserInfo) {
+        userImage.image = UIImage(named: "\(data.image)")
+        userNameLabel.text = data.userName
+        pointsLabeL.text = data.userRating
+    }
 }
