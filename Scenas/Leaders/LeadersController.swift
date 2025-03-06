@@ -44,6 +44,13 @@ class LeadersController: UIViewController {
     private lazy var complaintView: ComplaintView = {
         let view = ComplaintView()
         view.isHidden = true
+        view.didPressCancelButton = { [weak self] in
+            self?.closeComplaintView()
+        }
+        view.didPressYesToConfirmButton = { [weak self] in
+            self?.confirmButton()
+        }
+
         return view
     }()
 
@@ -85,6 +92,15 @@ class LeadersController: UIViewController {
     private func showComplainView() {
         challengeView.isHidden = true
         complaintView.isHidden = false
+    }
+
+    private func closeComplaintView() {
+        challengeView.isHidden = false
+        complaintView.isHidden = true
+    }
+
+    private func confirmButton() {
+        //TODO: press to confirm to send complaint back end
     }
 }
 

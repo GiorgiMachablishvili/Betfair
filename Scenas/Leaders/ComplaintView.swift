@@ -10,6 +10,9 @@ import SnapKit
 
 class ComplaintView: UIView {
 
+    var didPressCancelButton: (() -> Void)?
+    var didPressYesToConfirmButton: (() -> Void)?
+
     private lazy var viewMainBackground: UIView = {
         let view = UIView(frame: .zero)
         view.backgroundColor = .clear.withAlphaComponent(0.3)
@@ -141,14 +144,14 @@ class ComplaintView: UIView {
     }
 
     @objc private func clickCancelButton() {
-
+        didPressCancelButton?()
     }
 
     @objc private func clickYesToConfirmButton() {
-
+        didPressYesToConfirmButton?()
     }
 
     @objc private func clickCloseButton() {
-
+        didPressCancelButton?()
     }
 }
