@@ -5,6 +5,8 @@ import SnapKit
 
 class UserChallengeView: UIView {
 
+    var didPressComplainButton: (() -> Void)?
+
     private lazy var viewMainBackground: UIView = {
         let view = UIView(frame: .zero)
         view.backgroundColor = .clear.withAlphaComponent(0.3)
@@ -198,7 +200,7 @@ class UserChallengeView: UIView {
     }
 
     @objc private func clickComplaintButton() {
-
+        didPressComplainButton?()
     }
 
     @objc private func clickChallengeButton() {

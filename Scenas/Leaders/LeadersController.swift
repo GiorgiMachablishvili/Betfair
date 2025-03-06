@@ -35,6 +35,15 @@ class LeadersController: UIViewController {
     private lazy var challengeView: UserChallengeView = {
         let view = UserChallengeView()
         view.isHidden = true
+        view.didPressComplainButton = { [weak self] in
+            self?.showComplainView()
+        }
+        return view
+    }()
+
+    private lazy var complaintView: ComplaintView = {
+        let view = ComplaintView()
+        view.isHidden = true
         return view
     }()
 
@@ -50,7 +59,7 @@ class LeadersController: UIViewController {
         view.addSubview(topLeaderBoardView)
         view.addSubview(collectionView)
         view.addSubview(challengeView)
-
+        view.addSubview(complaintView)
     }
 
     private func setupConstraint() {
@@ -67,9 +76,17 @@ class LeadersController: UIViewController {
         challengeView.snp.remakeConstraints { make in
             make.edges.equalToSuperview()
         }
+
+        complaintView.snp.remakeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+    }
+
+    private func showComplainView() {
+        challengeView.isHidden = true
+        complaintView.isHidden = false
     }
 }
-
 
 extension LeadersController: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
