@@ -11,13 +11,16 @@ class LeadersController: UIViewController {
         UserInfo(image: "user3", userName: "Charlie", userRating: "1800")
     ]
 
+    private var filteredUsers: [UserInfo] = []
+
+    private var isSearching: Bool = false
 
     private lazy var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
         layout.itemSize = CGSize(width: view.frame.width, height: 70 * Constraint.yCoeff)
         layout.minimumLineSpacing = 4
-//        layout.sectionInset = UIEdgeInsets(top: 0, left: 0, bottom: 10 * Constraint.yCoeff, right: 0)
+        //        layout.sectionInset = UIEdgeInsets(top: 0, left: 0, bottom: 10 * Constraint.yCoeff, right: 0)
         let view = UICollectionView(frame: .zero, collectionViewLayout: layout)
         view.backgroundColor = .clear
         view.showsHorizontalScrollIndicator = false
@@ -37,6 +40,9 @@ class LeadersController: UIViewController {
         view.isHidden = true
         view.didPressComplainButton = { [weak self] in
             self?.showComplainView()
+        }
+        view.didPressColseButton = { [weak self] in
+            self?.closeChallengeView()
         }
         return view
     }()
@@ -58,8 +64,12 @@ class LeadersController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .mainViewsBackgroundYellow
 
+        filteredUsers = users
+
         setup()
         setupConstraint()
+
+        topLeaderBoardView.searchUsers.delegate = self
     }
 
     private func setup() {
@@ -94,6 +104,11 @@ class LeadersController: UIViewController {
         complaintView.isHidden = false
     }
 
+    private func closeChallengeView() {
+        challengeView.isHidden = true
+        self.tabBarController?.tabBar.isHidden = false
+    }
+
     private func closeComplaintView() {
         challengeView.isHidden = false
         complaintView.isHidden = true
@@ -106,19 +121,43 @@ class LeadersController: UIViewController {
 
 extension LeadersController: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return users.count
+        return filteredUsers.count
     }
-    
+
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "UsersCell", for: indexPath) as? UsersCell else {
             return UICollectionViewCell()
         }
-        let userInfo = users[indexPath.item]
+        let userInfo = filteredUsers[indexPath.item] // 🔹 Use filtered list
         cell.configuration(with: userInfo)
         return cell
     }
 
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        self.tabBarController?.tabBar.isHidden = true
         challengeView.isHidden = false
+    }
+}
+
+extension LeadersController: UISearchBarDelegate {
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        if searchText.isEmpty {
+            isSearching = false
+            filteredUsers = users
+        } else {
+            isSearching = true
+            filteredUsers = users.filter {
+                $0.userName.lowercased().contains(searchText.lowercased())
+            }
+        }
+        collectionView.reloadData() // 🔄 Refresh the list
+    }
+
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        isSearching = false
+        searchBar.text = ""
+        filteredUsers = users
+        collectionView.reloadData()
+        searchBar.resignFirstResponder()
     }
 }

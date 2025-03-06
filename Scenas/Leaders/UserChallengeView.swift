@@ -6,6 +6,7 @@ import SnapKit
 class UserChallengeView: UIView {
 
     var didPressComplainButton: (() -> Void)?
+    var didPressColseButton: (() -> Void)?
 
     private lazy var viewMainBackground: UIView = {
         let view = UIView(frame: .zero)
@@ -208,7 +209,7 @@ class UserChallengeView: UIView {
     }
 
     @objc private func clickCloseButton() {
-
+        didPressColseButton?()
     }
 
 }

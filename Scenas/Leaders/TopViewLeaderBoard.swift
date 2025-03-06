@@ -21,7 +21,7 @@ class TopViewLeaderBoard: UIView {
         return view
     }()
 
-    private lazy var searchUsers: UISearchBar = {
+    lazy var searchUsers: UISearchBar = {
         let view = UISearchBar()
         view.placeholder = "Enter the user's nickname"
         view.makeRoundCorners(16)
