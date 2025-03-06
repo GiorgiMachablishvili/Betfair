@@ -1,9 +1,4 @@
-//
-//  TimerView.swift
-//  Betfair
-//
-//  Created by Gio's Mac on 02.03.25.
-//
+
 
 import UIKit
 import SnapKit

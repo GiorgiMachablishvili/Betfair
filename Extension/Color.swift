@@ -1,9 +1,4 @@
-//
-//  Color.swift
-//  Betfair
-//
-//  Created by Gio's Mac on 28.02.25.
-//
+
 
 import UIKit
 

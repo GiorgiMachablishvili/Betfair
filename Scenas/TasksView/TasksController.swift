@@ -1,9 +1,4 @@
-//
-//  TasksController.swift
-//  Betfair
-//
-//  Created by Gio's Mac on 01.03.25.
-//
+
 
 import UIKit
 import SnapKit
@@ -55,8 +50,6 @@ class TasksController: UIViewController {
         view.isHidden = true
         return view
     }()
-
-
 
     override func viewDidLoad() {
         super.viewDidLoad()
