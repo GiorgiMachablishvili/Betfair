@@ -1,9 +1,4 @@
-//
-//  CompetitionController.swift
-//  Betfair
-//
-//  Created by Gio's Mac on 01.03.25.
-//
+
 
 import UIKit
 
