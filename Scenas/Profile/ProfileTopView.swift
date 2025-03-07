@@ -10,6 +10,8 @@ import SnapKit
 
 class ProfileTopView: UIView {
 
+    var didPressProfileAddButton: (() -> Void)?
+
     private lazy var topViewBackground: UIView = {
         let view = UIView(frame: .zero)
         view.backgroundColor = .blackColor
@@ -63,7 +65,7 @@ class ProfileTopView: UIView {
     lazy var profileAddButton: UIButton = {
         let view = UIButton(frame: .zero)
         view.setTitle("'''", for: .normal)
-        view.backgroundColor = UIColor.whiteColor.withAlphaComponent(0.6)
+        view.backgroundColor = UIColor.gayBackground.withAlphaComponent(0.5)
         view.titleLabel?.font = UIFont.poppinsMedium(size: 14)
         view.setTitleColor(UIColor.whiteColor, for: .normal)
         view.makeRoundCorners(22)
@@ -132,6 +134,6 @@ class ProfileTopView: UIView {
     }
 
     @objc private func clickProfileAddButton() {
-
+        didPressProfileAddButton?()
     }
 }

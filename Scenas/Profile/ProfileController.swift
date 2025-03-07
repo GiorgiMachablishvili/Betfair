@@ -30,6 +30,9 @@ class ProfileController: UIViewController {
 
     private lazy var topView: ProfileTopView = {
         let view = ProfileTopView()
+        view.didPressProfileAddButton = { [weak self] in
+            self?.showChangeUserInfoView()
+        }
         return view
     }()
 
@@ -48,6 +51,20 @@ class ProfileController: UIViewController {
         return view
     }()
 
+    private lazy var changeUserInfoView: ChangeUserInfoView = {
+        let view = ChangeUserInfoView()
+        view.isHidden = true
+        view.didPressUserImageButton = { [weak self] in
+            self?.updateUserInfo()
+        }
+        view.didPressCancelButton = { [weak self] in
+            self?.hideChangeUserInfoView()
+        }
+        return view
+    }()
+
+
+
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .mainViewsBackgroundYellow
@@ -62,6 +79,7 @@ class ProfileController: UIViewController {
         view.addSubview(seriesDayView)
         view.addSubview(taskCompletedView)
         view.addSubview(winCountView)
+        view.addSubview(changeUserInfoView)
     }
 
     private func setupConstraints() {
@@ -95,8 +113,68 @@ class ProfileController: UIViewController {
             make.top.equalTo(winCountView.snp.bottom).offset(16 * Constraint.yCoeff)
             make.leading.bottom.trailing.equalToSuperview()
         }
+
+        changeUserInfoView.snp.remakeConstraints { make in
+            make.edges.equalToSuperview()
+        }
     }
 
+    @objc private func updateUserInfo() {
+        let imagePicker = UIImagePickerController()
+        imagePicker.delegate = self
+        imagePicker.sourceType = .photoLibrary
+        imagePicker.allowsEditing = true
+        present(imagePicker, animated: true, completion: nil)
+//        guard let userId = UserDefaults.standard.value(forKey: "userId") as? Int else {
+//            print("userId not found or not an Int")
+//            return
+//        }
+//        // Get the selected image and nickname from the profile view
+//        let selectedImage = changeUserInfoView.selectedImage
+//        let nickname = changeUserInfoView.nameTextField.text
+//
+//        // Show loading indicator
+//        NetworkManager.shared.showProgressHud(true, animated: true)
+//
+//        // Send the PATCH request
+//        NetworkManager.shared.updateUserProfile(userId: userId, image: selectedImage, nickname: nickname) { [weak self] result in
+//            guard let self = self else { return }
+//
+//            DispatchQueue.main.async {
+//                NetworkManager.shared.showProgressHud(false, animated: false)
+//            }
+//
+//            switch result {
+//            case .success(let userData):
+//                // Update the UI with the new user data
+//                self.userData = userData
+//                DispatchQueue.main.async {
+//                    self.hideView() // Hide the edit profile view
+//                    self.collectionView.reloadData()
+//                }
+//            case .failure(let error):
+//                print("Failed to update user profile: \(error)")
+//                // Show an error message to the user
+//                self.showAlert(title: "Error", message: "Failed to update profile. Please try again.")
+//            }
+//        }
+    }
+
+    private func showAlert(title: String, message: String) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+        present(alert, animated: true)
+    }
+
+    private func showChangeUserInfoView() {
+        tabBarController?.tabBar.isHidden = true
+        changeUserInfoView.isHidden = false
+    }
+
+    private func hideChangeUserInfoView() {
+        tabBarController?.tabBar.isHidden = false
+        changeUserInfoView.isHidden = true
+    }
 }
 
 extension ProfileController: UICollectionViewDelegate, UICollectionViewDataSource {
@@ -111,5 +189,20 @@ extension ProfileController: UICollectionViewDelegate, UICollectionViewDataSourc
         let userInfo = users[indexPath.item]
         cell.configuration(with: userInfo, rank: indexPath.item + 1)
         return cell
+    }
+}
+
+extension ProfileController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
+        picker.dismiss(animated: true, completion: nil)
+
+        if let selectedImage = info[.editedImage] as? UIImage ?? info[.originalImage] as? UIImage {
+            changeUserInfoView.userImageButton.setImage(UIImage(named: "\(selectedImage)"), for: .normal) // Update the image view
+            changeUserInfoView.selectedImage = selectedImage // Store the selected image
+        }
+    }
+
+    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        picker.dismiss(animated: true, completion: nil)
     }
 }
