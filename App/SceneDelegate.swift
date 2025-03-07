@@ -10,7 +10,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else { return }
 
         window = UIWindow(windowScene: windowScene)
-        let mainViewController = Onboarding()
+        let mainViewController = SignInController()
         window?.rootViewController = UINavigationController(rootViewController: mainViewController)
         if let navigationController = window?.rootViewController as? UINavigationController {
                 navigationController.setNavigationBarHidden(true, animated: false)
@@ -24,7 +24,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func ifUserISCreatedOrNot() {
         if let userId = UserDefaults.standard.string(forKey: "userId"), !userId.isEmpty {
             print(userId)
-            let mainViewController = Onboarding()
+            let mainViewController = SignInController()
             UserDefaults.standard.setValue(false, forKey: "isGuestUser")
             let navigationController = UINavigationController(rootViewController: mainViewController)
             changeRootViewController(navigationController)
