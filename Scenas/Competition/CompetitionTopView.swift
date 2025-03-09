@@ -4,6 +4,10 @@ import UIKit
 import SnapKit
 
 class CompetitionTopView: UIView {
+
+    var didPressActiveButton: (() -> Void)?
+    var didPressCompletedButton: (() -> Void)?
+
     private lazy var topViewBackGround: UIView = {
         let view = UIView(frame: .zero)
         view.backgroundColor = .blackColor
@@ -86,11 +90,11 @@ class CompetitionTopView: UIView {
     }
 
     @objc private func clickActiveButton() {
-
+        didPressActiveButton?()
     }
 
     @objc private func clickCompletedButton() {
-
+        didPressCompletedButton?()
     }
 
 }

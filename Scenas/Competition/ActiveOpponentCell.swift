@@ -3,7 +3,7 @@
 import UIKit
 import SnapKit
 
-class ChosenOpponentCell: UICollectionViewCell {
+class ActiveOpponentCell: UICollectionViewCell {
 
     private lazy var userViewBackground: UIView = {
         let view = UIView(frame: .zero)
@@ -55,6 +55,25 @@ class ChosenOpponentCell: UICollectionViewCell {
         return view
     }()
 
+    lazy var youBeenChallengedLabel: UILabel = {
+        let view = UILabel(frame: .zero)
+        view.text = "You've been challenged"
+        view.textColor = UIColor.blackColor
+        view.font = UIFont.poppinsBold(size: 24)
+        view.textAlignment = .center
+        return view
+    }()
+
+    lazy var challengedInfoLabel: UILabel = {
+        let view = UILabel(frame: .zero)
+        view.text = "Complete more challenges than your opponent"
+        view.textColor = UIColor.blackColor
+        view.font = UIFont.poppinsRegular(size: 14)
+        view.numberOfLines = 2
+        view.textAlignment = .center
+        return view
+    }()
+
     lazy var refuseButton: UIButton = {
         let view = UIButton(frame: .zero)
         view.setTitle("Refuse", for: .normal)
@@ -95,6 +114,8 @@ class ChosenOpponentCell: UICollectionViewCell {
         addSubview(userRatingView)
         addSubview(topLabel)
         addSubview(ratingNumberLabel)
+        addSubview(youBeenChallengedLabel)
+        addSubview(challengedInfoLabel)
         addSubview(refuseButton)
         addSubview(acceptButton)
     }
@@ -113,6 +134,7 @@ class ChosenOpponentCell: UICollectionViewCell {
         userNameLabel.snp.remakeConstraints { make in
             make.centerX.equalTo(userViewBackground)
             make.top.equalTo(userImage.snp.bottom).offset(4 * Constraint.yCoeff)
+            make.height.equalTo(24 * Constraint.yCoeff)
         }
 
         userRatingView.snp.remakeConstraints { make in
@@ -132,10 +154,31 @@ class ChosenOpponentCell: UICollectionViewCell {
             make.leading.equalTo(topLabel.snp.trailing).offset(4 * Constraint.xCoeff)
         }
 
-        //TODO: add label and info
+        youBeenChallengedLabel.snp.remakeConstraints { make in
+//            make.centerY.equalTo(userViewBackground)
+            make.top.equalTo(userRatingView.snp.bottom).offset(39 * Constraint.xCoeff)
+            make.height.equalTo(36 * Constraint.yCoeff)
+            make.leading.trailing.equalToSuperview().inset(20 * Constraint.xCoeff)
+        }
+
+        challengedInfoLabel.snp.remakeConstraints { make in
+            make.top.equalTo(youBeenChallengedLabel.snp.bottom)
+            make.leading.trailing.equalToSuperview().inset(20 * Constraint.xCoeff)
+            make.height.equalTo(42 * Constraint.yCoeff)
+        }
 
         refuseButton.snp.remakeConstraints { make in
-            make.top.equalTo(<#T##other: ConstraintRelatableTarget##ConstraintRelatableTarget#>)
+            make.top.equalTo(challengedInfoLabel.snp.bottom).offset(20 * Constraint.yCoeff)
+            make.leading.equalTo(userViewBackground.snp.leading).offset(20 * Constraint.xCoeff)
+            make.height.equalTo(60 * Constraint.yCoeff)
+            make.width.equalTo(155 * Constraint.xCoeff)
+        }
+
+        acceptButton.snp.remakeConstraints { make in
+            make.top.equalTo(challengedInfoLabel.snp.bottom).offset(20 * Constraint.yCoeff)
+            make.trailing.equalTo(userViewBackground.snp.trailing).offset(-20 * Constraint.xCoeff)
+            make.height.equalTo(60 * Constraint.yCoeff)
+            make.width.equalTo(155 * Constraint.xCoeff)
         }
     }
 
@@ -147,3 +190,4 @@ class ChosenOpponentCell: UICollectionViewCell {
 
     }
 }
+
