@@ -147,7 +147,9 @@ class CompletedCell: UICollectionViewCell {
 
     private func setupConstraint() {
         userViewBackground.snp.remakeConstraints { make in
-            make.edges.equalToSuperview()
+            make.top.equalTo(snp.top).offset(16 * Constraint.yCoeff)
+            make.leading.trailing.equalToSuperview().inset(16 * Constraint.xCoeff)
+            make.height.equalTo(368 * Constraint.yCoeff)
         }
 
         dataLabel.snp.remakeConstraints { make in

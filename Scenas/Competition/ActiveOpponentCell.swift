@@ -5,6 +5,8 @@ import SnapKit
 
 class ActiveOpponentCell: UICollectionViewCell {
 
+    var didPressAcceptButton: (() -> Void)?
+
     private lazy var userViewBackground: UIView = {
         let view = UIView(frame: .zero)
         view.backgroundColor = .whiteColor
@@ -122,7 +124,9 @@ class ActiveOpponentCell: UICollectionViewCell {
 
     private func setupConstraint() {
         userViewBackground.snp.remakeConstraints { make in
-            make.edges.equalToSuperview()
+            make.top.equalTo(snp.top).offset(16 * Constraint.yCoeff)
+            make.leading.trailing.equalToSuperview().inset(16 * Constraint.xCoeff)
+            make.height.equalTo(410 * Constraint.yCoeff)
         }
 
         userImage.snp.remakeConstraints { make in
@@ -163,8 +167,9 @@ class ActiveOpponentCell: UICollectionViewCell {
 
         challengedInfoLabel.snp.remakeConstraints { make in
             make.top.equalTo(youBeenChallengedLabel.snp.bottom)
-            make.leading.trailing.equalToSuperview().inset(20 * Constraint.xCoeff)
+            make.centerX.equalTo(userViewBackground)
             make.height.equalTo(42 * Constraint.yCoeff)
+            make.width.equalTo(300 * Constraint.xCoeff)
         }
 
         refuseButton.snp.remakeConstraints { make in
@@ -187,7 +192,7 @@ class ActiveOpponentCell: UICollectionViewCell {
     }
 
     @objc private func clickAcceptButton() {
-
+        didPressAcceptButton?()
     }
 }
 

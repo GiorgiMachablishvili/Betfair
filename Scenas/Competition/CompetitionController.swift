@@ -6,11 +6,12 @@ import SnapKit
 class CompetitionController: UIViewController {
 
     private var isShowingActive: Bool = true
+    private var isAcceptChallengedViewVisible: Bool = false
 
     private lazy var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
-        layout.itemSize = CGSize(width: /*view.frame.width*/358 * Constraint.xCoeff, height: 410 * Constraint.yCoeff)
+        layout.itemSize = CGSize(width: view.frame.width, height: view.frame.height)
         layout.minimumLineSpacing = 4
         let view = UICollectionView(frame: .zero, collectionViewLayout: layout)
         view.backgroundColor = .clear
@@ -19,6 +20,7 @@ class CompetitionController: UIViewController {
         view.delegate = self
         view.register(ActiveOpponentCell.self, forCellWithReuseIdentifier: "ActiveOpponentCell")
         view.register(CompletedCell.self, forCellWithReuseIdentifier: "CompletedCell")
+        view.register(AcceptChallengedCell.self, forCellWithReuseIdentifier: "AcceptChallengedCell")
         return view
     }()
 
@@ -45,7 +47,7 @@ class CompetitionController: UIViewController {
     private func setup() {
         view.addSubview(competitionTopView)
         view.addSubview(collectionView)
-
+//        view.addSubview(acceptChallengedView)
     }
 
     private func setupConstraint() {
@@ -62,12 +64,17 @@ class CompetitionController: UIViewController {
 
     private func activeOpponentButton() {
         isShowingActive = true
-        updateButtonStyles()
-        collectionView.reloadData()
+        isAcceptChallengedViewVisible = false
+        updateUI()
     }
 
     private func completedButton() {
         isShowingActive = false
+        isAcceptChallengedViewVisible = false
+        updateUI()
+    }
+
+    private func updateUI() {
         updateButtonStyles()
         collectionView.reloadData()
     }
@@ -87,6 +94,16 @@ class CompetitionController: UIViewController {
             competitionTopView.activeButton.setTitleColor(.white, for: .normal)
         }
     }
+
+    private func showAcceptChallengedView() {
+        isAcceptChallengedViewVisible = true
+        updateUI()
+    }
+
+    private func hideAcceptChallengedView() {
+        isAcceptChallengedViewVisible = false
+        updateUI()
+    }
 }
 
 extension CompetitionController: UICollectionViewDelegate, UICollectionViewDataSource {
@@ -95,12 +112,27 @@ extension CompetitionController: UICollectionViewDelegate, UICollectionViewDataS
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        if isShowingActive {
+        if isAcceptChallengedViewVisible {
+            // Show AcceptChallengedCell when challenge is accepted
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "AcceptChallengedCell", for: indexPath) as? AcceptChallengedCell else {
+                return UICollectionViewCell()
+            }
+            cell.didPressSurrenderButton = { [weak self] in
+                self?.hideAcceptChallengedView()
+            }
+            return cell
+        } else if isShowingActive {
+            // Show ActiveOpponentCell
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ActiveOpponentCell", for: indexPath) as? ActiveOpponentCell else {
                 return UICollectionViewCell()
             }
+            cell.didPressAcceptButton = { [weak self] in
+                self?.showAcceptChallengedView()
+            }
+
             return cell
         } else {
+            // Show CompletedCell
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "CompletedCell", for: indexPath) as? CompletedCell else {
                 return UICollectionViewCell()
             }
