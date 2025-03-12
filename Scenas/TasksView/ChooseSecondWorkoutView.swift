@@ -14,6 +14,12 @@ class ChooseSecondWorkoutView: UIView {
         return view
     }()
 
+    private lazy var yellowWhiteBackground: UIImageView = {
+        let view = UIImageView(frame: .zero)
+        view.image = UIImage(named: "yellowWhiteBackgroound")
+        return view
+    }()
+
     private lazy var workoutNumberView: UIView = {
         let view = UIImageView(frame: .zero)
         view.backgroundColor = .mainViewsBackgroundYellow
@@ -83,6 +89,7 @@ class ChooseSecondWorkoutView: UIView {
 
     private func setup() {
         addSubview(workoutBackground)
+        addSubview(yellowWhiteBackground)
         addSubview(workoutNumberView)
         addSubview(workoutNumberLabel)
         addSubview(workoutTitle)
@@ -94,6 +101,11 @@ class ChooseSecondWorkoutView: UIView {
     private func setupConstraints() {
         workoutBackground.snp.makeConstraints { make in
             make.edges.equalToSuperview()
+        }
+
+        yellowWhiteBackground.snp.remakeConstraints { make in
+            make.leading.top.trailing.equalToSuperview()
+            make.height.equalTo(212 * Constraint.yCoeff)
         }
 
         workoutNumberView.snp.remakeConstraints { make in

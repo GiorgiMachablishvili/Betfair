@@ -13,7 +13,7 @@ class Onboarding: UIViewController {
         layout.itemSize = CGSize(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
         layout.minimumLineSpacing = 0
         let view = UICollectionView(frame: .zero, collectionViewLayout: layout)
-//                view.isPagingEnabled = true
+        view.isPagingEnabled = true
         view.showsHorizontalScrollIndicator = false
         view.dataSource = self
         view.delegate = self
@@ -121,7 +121,15 @@ class Onboarding: UIViewController {
         if currentIndex < onboardingView.count - 1 {
             currentIndex += 1
             let indexPath = IndexPath(item: currentIndex, section: 0)
+
+            // Temporarily disable paging to allow smooth scrolling
+            collectionView.isPagingEnabled = false
             collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: true)
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                self.collectionView.isPagingEnabled = true
+            }
+
             pageControl.currentPage = currentIndex
         } else {
             beforeStartView.isHidden = false
@@ -129,6 +137,8 @@ class Onboarding: UIViewController {
         }
         updateNextButtonTitle()
     }
+
+
 
     private func updateNextButtonTitle() {
         let isLastPage = currentIndex == onboardingView.count - 1
@@ -153,5 +163,6 @@ extension Onboarding: UICollectionViewDelegate, UICollectionViewDataSource {
         let pageIndex = Int(scrollView.contentOffset.x / scrollView.frame.width)
         currentIndex = pageIndex
         pageControl.currentPage = pageIndex
+        updateNextButtonTitle()
     }
 }

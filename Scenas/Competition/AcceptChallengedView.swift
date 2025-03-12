@@ -128,6 +128,12 @@ class AcceptChallengedCell: UICollectionViewCell {
         return view
     }()
 
+    private lazy var yellowWhiteBackground: UIImageView = {
+        let view = UIImageView(frame: .zero)
+        view.image = UIImage(named: "yellowWhiteBackgroound")
+        return view
+    }()
+
     private lazy var workoutNumberView: UIView = {
         let view = UIImageView(frame: .zero)
         view.backgroundColor = .mainViewsBackgroundYellow
@@ -136,7 +142,7 @@ class AcceptChallengedCell: UICollectionViewCell {
         return view
     }()
 
-    private lazy var workoutNumberLabel: UILabel = {
+    lazy var workoutNumberLabel: UILabel = {
         let view = UILabel(frame: .zero)
         view.text = "1"
         view.textColor = UIColor.whiteColor
@@ -188,6 +194,7 @@ class AcceptChallengedCell: UICollectionViewCell {
         super.init(frame: frame)
         setup()
         setupConstraints()
+        loadRandomWorkout()
     }
 
     required init?(coder: NSCoder) {
@@ -209,6 +216,7 @@ class AcceptChallengedCell: UICollectionViewCell {
         addSubview(currentCompetitionInfoLabel)
         addSubview(surrenderButton)
         addSubview(workoutBackground)
+        addSubview(yellowWhiteBackground)
         addSubview(workoutNumberView)
         addSubview(workoutNumberLabel)
         addSubview(workoutTitle)
@@ -222,6 +230,11 @@ class AcceptChallengedCell: UICollectionViewCell {
             make.top.equalTo(snp.top).offset(16 * Constraint.yCoeff)
             make.leading.trailing.equalToSuperview().inset(16 * Constraint.xCoeff)
             make.height.equalTo(326 * Constraint.yCoeff)
+        }
+
+        yellowWhiteBackground.snp.remakeConstraints { make in
+            make.leading.top.trailing.equalTo(workoutBackground)
+            make.height.equalTo(212 * Constraint.yCoeff)
         }
 
         userImage.snp.remakeConstraints { make in
@@ -360,12 +373,18 @@ class AcceptChallengedCell: UICollectionViewCell {
         return attributedString
     }
 
+    func loadRandomWorkout() {
+        guard let randomWorkout = workouts.randomElement() else { return }
+        workoutTitle.text = randomWorkout.title
+        workoutDescription.text = "\(randomWorkout.description) (\(randomWorkout.duration) sec)"
+    }
+
     @objc private func clickSurrenderButton() {
         didPressSurrenderButton?()
     }
 
     @objc private func clickSkipButton() {
-
+        loadRandomWorkout()
     }
 
     @objc private func clickGetStartedButton() {

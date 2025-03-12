@@ -14,6 +14,12 @@ class ActiveOpponentCell: UICollectionViewCell {
         return view
     }()
 
+    private lazy var yellowWhiteBackground: UIImageView = {
+        let view = UIImageView(frame: .zero)
+        view.image = UIImage(named: "yellowWhiteBackgroound")
+        return view
+    }()
+
     private lazy var userImage: UIImageView = {
         let view = UIImageView(frame: .zero)
         view.image = UIImage(named: "profile")
@@ -111,6 +117,7 @@ class ActiveOpponentCell: UICollectionViewCell {
 
     private func setup() {
         addSubview(userViewBackground)
+        addSubview(yellowWhiteBackground)
         addSubview(userImage)
         addSubview(userNameLabel)
         addSubview(userRatingView)
@@ -127,6 +134,11 @@ class ActiveOpponentCell: UICollectionViewCell {
             make.top.equalTo(snp.top).offset(16 * Constraint.yCoeff)
             make.leading.trailing.equalToSuperview().inset(16 * Constraint.xCoeff)
             make.height.equalTo(410 * Constraint.yCoeff)
+        }
+
+        yellowWhiteBackground.snp.remakeConstraints { make in
+            make.leading.top.trailing.equalToSuperview()
+            make.height.equalTo(212 * Constraint.yCoeff)
         }
 
         userImage.snp.remakeConstraints { make in

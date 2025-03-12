@@ -151,8 +151,9 @@ class OnboardingBeforeStartView: UIView {
 
         acceptButton.snp.remakeConstraints { make in
             make.bottom.equalTo(beforeStartBackground.snp.bottom).offset(-20 * Constraint.yCoeff)
-            make.leading.trailing.equalToSuperview().inset(20 * Constraint.xCoeff)
+            make.centerX.equalTo(beforeStartBackground)
             make.height.equalTo(60 * Constraint.yCoeff)
+            make.width.equalTo(318 * Constraint.xCoeff)
         }
 
         closeButton.snp.remakeConstraints { make in

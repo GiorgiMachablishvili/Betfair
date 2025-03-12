@@ -129,60 +129,6 @@ class TasksController: UIViewController {
         }
     }
 
-
-//    private func startCountdown() {
-//        timerView.startButton.setTitle("Reinvented", for: .normal)
-//        timerView.startButton.isUserInteractionEnabled = false
-//        timerView.startButton.backgroundColor = UIColor.mainViewsBackgroundYellow.withAlphaComponent(0.3)
-//
-//        if let selectedWorkout = workouts.first(where: { $0.title == chooseFirstWorkoutView.workoutTitle.text }) {
-//            let countdownNumbers = ["3", "2", "1", "GO", "\(selectedWorkout.duration)"]
-//
-//            // Show countdown numbers one by one
-//            for (index, number) in countdownNumbers.enumerated() {
-//                DispatchQueue.main.asyncAfter(deadline: .now() + Double(index)) {
-//                    self.timerView.workoutNumberLabel.text = number
-//
-//                    // After "GO", start the workout timer
-//                    if number == "GO" {
-//                        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-//                            self.startWorkoutTimer()
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//    }
-
-//    private func startCountdown() {
-//        // Stop any existing countdown timer
-//        countdownTimer?.invalidate()
-//        countdownTimer = nil
-//
-//        timerView.startButton.setTitle("Reinvented", for: .normal)
-//        timerView.startButton.isUserInteractionEnabled = false
-//        timerView.startButton.backgroundColor = UIColor.mainViewsBackgroundYellow.withAlphaComponent(0.3)
-//
-//        let countdownNumbers = ["3", "2", "1", "GO"]
-//        var index = 0
-//
-//        // Start a fresh countdown
-//        countdownTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
-//            if index < countdownNumbers.count {
-//                self.timerView.workoutNumberLabel.text = countdownNumbers[index]
-//                index += 1
-//            } else {
-//                timer.invalidate()
-//                self.countdownTimer = nil
-//
-//                // After "GO", start the workout timer
-//                if let selectedWorkout = workouts.first(where: { $0.title == self.chooseFirstWorkoutView.workoutTitle.text }) {
-//                    self.startWorkoutTimer(duration: selectedWorkout.duration)
-//                }
-//            }
-//        }
-//    }
-
     private func startCountdown() {
         // Stop any existing countdown timer
         countdownTimer?.invalidate()

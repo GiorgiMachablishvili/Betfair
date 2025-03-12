@@ -10,6 +10,8 @@ class CompetitionController: UIViewController {
 
     private var activeWorkoutCell: UICollectionViewCell?
 
+    private var countdownTimer: Timer?
+
     private lazy var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
@@ -37,6 +39,7 @@ class CompetitionController: UIViewController {
         return view
     }()
 
+    //TODO: add buttons func
     private lazy var timerView: TimerView = {
         let view = TimerView()
 //        view.didPressStartedButton = { [weak self] in
@@ -126,21 +129,104 @@ class CompetitionController: UIViewController {
     
 
     private func getTimerWorkout() {
-        // Set AcceptChallengedCell as the active workout view
+        // Get the AcceptChallengedCell as the active workout view
         activeWorkoutCell = collectionView.cellForItem(at: IndexPath(item: 0, section: 0)) as? AcceptChallengedCell
 
-        // Show the timerView and hide the tab bar
+        // Show timerView and hide the tab bar
         timerView.isHidden = false
         tabBarController?.tabBar.isHidden = true
 
-        // Ensure AcceptChallengedCell exists and get workout details
-        if let acceptCell = activeWorkoutCell as? AcceptChallengedCell,
-           let selectedWorkout = workouts.first(where: { $0.title == acceptCell.currentCompetitionLabel.text }) {
+        // Ensure AcceptChallengedCell exists and extract workout details
+        if let acceptCell = activeWorkoutCell as? AcceptChallengedCell {
+            let workoutTitle = acceptCell.workoutTitle.text ?? "Workout"
+            let workoutDescriptionText = acceptCell.workoutDescription.text ?? ""
 
-            // Update timerView with the workout details
-            timerView.workoutTitle.text = selectedWorkout.title
-            timerView.workoutDescription.text = "\(selectedWorkout.description) (\(selectedWorkout.duration) sec)"
-            timerView.workoutNumberLabel.text = "\(selectedWorkout.duration) Sec"
+            // Extract the duration number from workoutDescription
+            let duration = extractDuration(from: workoutDescriptionText)
+
+            // Update timerView with the extracted workout details
+            timerView.workoutTitle.text = workoutTitle
+            timerView.workoutDescription.text = workoutDescriptionText
+            timerView.workoutNumberLabel.text = "\(duration) Sec"
+
+            // Start the countdown timer
+            startCountdown(with: duration)
+        }
+    }
+
+    //TODO: need update correct timer number
+    private func extractDuration(from text: String) -> Int {
+        let words = text.components(separatedBy: " ")
+        for word in words {
+            if let number = Int(word) {
+                return number
+            }
+        }
+        return 30 
+    }
+
+    private func startCountdown(with duration: Int) {
+        countdownTimer?.invalidate()
+        countdownTimer = nil
+
+        timerView.startButton.setTitle("Reinvented", for: .normal)
+        timerView.startButton.isUserInteractionEnabled = false
+        timerView.startButton.backgroundColor = UIColor.mainViewsBackgroundYellow.withAlphaComponent(0.3)
+
+        let countdownNumbers = ["3", "2", "1", "GO"]
+        var index = 0
+
+        // Start a fresh countdown
+        countdownTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
+            if index < countdownNumbers.count {
+                self.timerView.workoutNumberLabel.text = countdownNumbers[index]
+                index += 1
+            } else {
+                timer.invalidate()
+                self.countdownTimer = nil
+                self.startWorkoutTimer(duration: duration)
+            }
+        }
+    }
+
+    private func startWorkoutTimer(duration: Int) {
+        // Stop any existing workout timer before starting a new one
+        countdownTimer?.invalidate()
+        countdownTimer = nil
+
+        timerView.startButton.isUserInteractionEnabled = true
+        timerView.startButton.backgroundColor = UIColor.mainViewsBackgroundYellow
+
+        var timeRemaining = duration
+        timerView.workoutNumberLabel.text = "\(timeRemaining)"
+
+        countdownTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
+            if timeRemaining > 0 {
+                timeRemaining -= 1
+                self.timerView.workoutNumberLabel.text = "\(timeRemaining)"
+            } else {
+                timer.invalidate()
+                self.countdownTimer = nil
+                self.timerView.workoutNumberLabel.text = "✔️"
+                self.timerView.workoutTitle.text = "Completed!"
+                self.timerView.workoutDescription.text = "You did a great job!"
+                self.timerView.startButton.setTitle("Okay", for: .normal)
+
+                // Add an action to close the timer view
+                self.timerView.startButton.addTarget(self, action: #selector(self.hideTimerView), for: .touchUpInside)
+            }
+        }
+    }
+
+    @objc private func hideTimerView() {
+        timerView.isHidden = true
+        tabBarController?.tabBar.isHidden = false
+
+        if let acceptCell = activeWorkoutCell as? AcceptChallengedCell {
+            acceptCell.loadRandomWorkout()
+//            if let currentNumber = Int(acceptCell.workoutNumberLabel.text ?? "0") {
+//                acceptCell.workoutNumberLabel.text = "\(currentNumber + 1)"
+//            }
         }
     }
 }
