@@ -5,6 +5,7 @@ import SnapKit
 class AcceptChallengedCell: UICollectionViewCell {
 
     var didPressSurrenderButton: (() -> Void)?
+    var didPressGetStartedButton: (() -> Void)?
 
     private lazy var userViewBackground: UIView = {
         let view = UIView(frame: .zero)
@@ -90,7 +91,7 @@ class AcceptChallengedCell: UICollectionViewCell {
         return view
     }()
 
-    private lazy var currentCompetitionLabel: UILabel = {
+    lazy var currentCompetitionLabel: UILabel = {
         let view = UILabel(frame: .zero)
         view.text = "Current competition"
         view.font = UIFont.poppinsBold(size: 24)
@@ -368,6 +369,6 @@ class AcceptChallengedCell: UICollectionViewCell {
     }
 
     @objc private func clickGetStartedButton() {
-
+        didPressGetStartedButton?()
     }
 }

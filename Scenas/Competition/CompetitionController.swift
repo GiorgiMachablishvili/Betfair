@@ -8,6 +8,8 @@ class CompetitionController: UIViewController {
     private var isShowingActive: Bool = true
     private var isAcceptChallengedViewVisible: Bool = false
 
+    private var activeWorkoutCell: UICollectionViewCell?
+
     private lazy var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
@@ -35,6 +37,19 @@ class CompetitionController: UIViewController {
         return view
     }()
 
+    private lazy var timerView: TimerView = {
+        let view = TimerView()
+//        view.didPressStartedButton = { [weak self] in
+//            self?.startCountdown()
+//        }
+//        view.didPressCloseButton = { [weak self] in
+//            self?.stopTimerAndHideView()
+//        }
+        view.isHidden = true
+        return view
+    }()
+
+
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .mainViewsBackgroundYellow
@@ -47,7 +62,7 @@ class CompetitionController: UIViewController {
     private func setup() {
         view.addSubview(competitionTopView)
         view.addSubview(collectionView)
-//        view.addSubview(acceptChallengedView)
+        view.addSubview(timerView)
     }
 
     private func setupConstraint() {
@@ -59,6 +74,10 @@ class CompetitionController: UIViewController {
         collectionView.snp.remakeConstraints { make in
             make.top.equalTo(competitionTopView.snp.bottom).offset(16 * Constraint.yCoeff)
             make.leading.bottom.trailing.equalToSuperview()
+        }
+
+        timerView.snp.remakeConstraints { make in
+            make.edges.equalToSuperview()
         }
     }
 
@@ -104,6 +123,26 @@ class CompetitionController: UIViewController {
         isAcceptChallengedViewVisible = false
         updateUI()
     }
+    
+
+    private func getTimerWorkout() {
+        // Set AcceptChallengedCell as the active workout view
+        activeWorkoutCell = collectionView.cellForItem(at: IndexPath(item: 0, section: 0)) as? AcceptChallengedCell
+
+        // Show the timerView and hide the tab bar
+        timerView.isHidden = false
+        tabBarController?.tabBar.isHidden = true
+
+        // Ensure AcceptChallengedCell exists and get workout details
+        if let acceptCell = activeWorkoutCell as? AcceptChallengedCell,
+           let selectedWorkout = workouts.first(where: { $0.title == acceptCell.currentCompetitionLabel.text }) {
+
+            // Update timerView with the workout details
+            timerView.workoutTitle.text = selectedWorkout.title
+            timerView.workoutDescription.text = "\(selectedWorkout.description) (\(selectedWorkout.duration) sec)"
+            timerView.workoutNumberLabel.text = "\(selectedWorkout.duration) Sec"
+        }
+    }
 }
 
 extension CompetitionController: UICollectionViewDelegate, UICollectionViewDataSource {
@@ -119,6 +158,9 @@ extension CompetitionController: UICollectionViewDelegate, UICollectionViewDataS
             }
             cell.didPressSurrenderButton = { [weak self] in
                 self?.hideAcceptChallengedView()
+            }
+            cell.didPressGetStartedButton = { [weak self] in
+                self?.getTimerWorkout()
             }
             return cell
         } else if isShowingActive {
