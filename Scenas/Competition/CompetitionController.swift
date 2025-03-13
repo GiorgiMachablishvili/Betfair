@@ -40,23 +40,6 @@ class CompetitionController: UIViewController {
         return view
     }()
 
-//    private lazy var timerView: TimerView = {
-//        let view = TimerView()
-//        view.didPressStartedButton = { [weak self] in
-//            guard let self = self else { return }
-//            if let text = self.timerView.workoutNumberLabel.text, let duration = Int(text) {
-//                self.startCountdownTimer(with: duration)
-//            } else {
-//                print("Error: Invalid duration value")
-//            }
-//        }
-//        view.didPressCloseButton = { [weak self] in
-//            self?.stopTimerAndHideView()
-//        }
-//        view.isHidden = true
-//        return view
-//    }()
-
     private lazy var timerView: TimerView = {
         let view = TimerView()
         view.didPressStartedButton = { [weak self] in
@@ -83,7 +66,11 @@ class CompetitionController: UIViewController {
         return view
     }()
 
-
+    private lazy var doNotHaveChallengesView: DoNotHaveChallengesView = {
+        let view = DoNotHaveChallengesView()
+        view.isHidden = true
+        return view
+    }()
 
 
     override func viewDidLoad() {
@@ -99,6 +86,7 @@ class CompetitionController: UIViewController {
         view.addSubview(competitionTopView)
         view.addSubview(collectionView)
         view.addSubview(timerView)
+        view.addSubview(doNotHaveChallengesView)
     }
 
     private func setupConstraint() {
@@ -113,6 +101,10 @@ class CompetitionController: UIViewController {
         }
 
         timerView.snp.remakeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+
+        doNotHaveChallengesView.snp.remakeConstraints { make in
             make.edges.equalToSuperview()
         }
     }
@@ -159,34 +151,7 @@ class CompetitionController: UIViewController {
         isAcceptChallengedViewVisible = false
         updateUI()
     }
-    
 
-//    private func getTimerWorkout() {
-//        // Get the AcceptChallengedCell as the active workout view
-//        activeWorkoutCell = collectionView.cellForItem(at: IndexPath(item: 0, section: 0)) as? AcceptChallengedCell
-//
-//        // Show timerView and hide the tab bar
-//        timerView.isHidden = false
-//        tabBarController?.tabBar.isHidden = true
-//
-//        // Ensure AcceptChallengedCell exists and extract workout details
-//        
-//        if let acceptCell = activeWorkoutCell as? AcceptChallengedCell {
-//            let workoutTitle = acceptCell.workoutTitle.text ?? "Workout"
-//            let workoutDescriptionText = acceptCell.workoutDescription.text ?? ""
-//
-//            // Extract the duration number from workoutDescription
-//            let duration = extractDuration(from: workoutDescriptionText)
-//
-//            // Update timerView with the extracted workout details
-//            timerView.workoutTitle.text = workoutTitle
-//            timerView.workoutDescription.text = workoutDescriptionText
-//            timerView.workoutNumberLabel.text = "\(duration) Sec"
-//
-//            // Start the countdown timer
-//            startCountdownTimer(with: duration)
-//        }
-//    }
     private func getTimerWorkout() {
         // Get the AcceptChallengedCell as the active workout view
         activeWorkoutCell = collectionView.cellForItem(at: IndexPath(item: 0, section: 0)) as? AcceptChallengedCell
@@ -325,7 +290,6 @@ extension CompetitionController: UICollectionViewDelegate, UICollectionViewDataS
             cell.didPressAcceptButton = { [weak self] in
                 self?.showAcceptChallengedView()
             }
-
             return cell
         } else {
             // Show CompletedCell
