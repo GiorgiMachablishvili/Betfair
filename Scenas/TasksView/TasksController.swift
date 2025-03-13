@@ -212,32 +212,6 @@ class TasksController: UIViewController {
         tabBarController?.tabBar.isHidden = false
     }
 
-
-//    private func startWorkoutTimer() {
-//        timerView.startButton.isUserInteractionEnabled = true
-//        timerView.startButton.backgroundColor = UIColor.mainViewsBackgroundYellow
-//
-//        guard let durationText = timerView.workoutNumberLabel.text?.components(separatedBy: " ").first,
-//              let duration = Int(durationText) else { return }
-//
-//        var timeRemaining = duration
-//        timerView.workoutNumberLabel.text = "\(timeRemaining)"
-//
-//        Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
-//            if timeRemaining > 0 {
-//                timeRemaining -= 1
-//                self.timerView.workoutNumberLabel.text = "\(timeRemaining)"
-//            } else {
-//                timer.invalidate()
-//                self.timerView.workoutNumberLabel.text = "✔️"
-//                self.timerView.workoutTitle.text = "Completed!"
-//                self.timerView.workoutDescription.text = "You did a great job"
-//                self.timerView.startButton.setTitle("Okey", for: .normal)
-//
-//                self.timerView.startButton.addTarget(self, action: #selector(self.hideTimerView), for: .touchUpInside)
-//            }
-//        }
-//    }
     @objc private func hideTimerView() {
         timerView.isHidden = true
         tabBarController?.tabBar.isHidden = false

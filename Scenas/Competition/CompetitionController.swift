@@ -10,6 +10,7 @@ class CompetitionController: UIViewController {
 
     private var activeWorkoutCell: UICollectionViewCell?
 
+//    private var workoutTimer: Timer?
     private var countdownTimer: Timer?
 
     private lazy var collectionView: UICollectionView = {
@@ -39,18 +40,50 @@ class CompetitionController: UIViewController {
         return view
     }()
 
-    //TODO: add buttons func
-    private lazy var timerView: TimerView = {
-        let view = TimerView()
+//    private lazy var timerView: TimerView = {
+//        let view = TimerView()
 //        view.didPressStartedButton = { [weak self] in
-//            self?.startCountdown()
+//            guard let self = self else { return }
+//            if let text = self.timerView.workoutNumberLabel.text, let duration = Int(text) {
+//                self.startCountdownTimer(with: duration)
+//            } else {
+//                print("Error: Invalid duration value")
+//            }
 //        }
 //        view.didPressCloseButton = { [weak self] in
 //            self?.stopTimerAndHideView()
 //        }
+//        view.isHidden = true
+//        return view
+//    }()
+
+    private lazy var timerView: TimerView = {
+        let view = TimerView()
+        view.didPressStartedButton = { [weak self] in
+            guard let self = self else { return }
+
+            // Ensure activeWorkoutCell is of type AcceptChallengedCell
+            if let acceptCell = self.activeWorkoutCell as? AcceptChallengedCell {
+                let workoutTitle = acceptCell.workoutTitle.text
+
+                // Find the workout in the `workouts` array
+                if let selectedWorkout = workouts.first(where: { $0.title == workoutTitle }) {
+                    self.startCountdownTimer(with: selectedWorkout.duration)
+                } else {
+                    print("Error: Workout not found in the list")
+                }
+            } else {
+                print("Error: No active workout selected")
+            }
+        }
+        view.didPressCloseButton = { [weak self] in
+            self?.stopTimerAndHideView()
+        }
         view.isHidden = true
         return view
     }()
+
+
 
 
     override func viewDidLoad() {
@@ -128,31 +161,57 @@ class CompetitionController: UIViewController {
     }
     
 
+//    private func getTimerWorkout() {
+//        // Get the AcceptChallengedCell as the active workout view
+//        activeWorkoutCell = collectionView.cellForItem(at: IndexPath(item: 0, section: 0)) as? AcceptChallengedCell
+//
+//        // Show timerView and hide the tab bar
+//        timerView.isHidden = false
+//        tabBarController?.tabBar.isHidden = true
+//
+//        // Ensure AcceptChallengedCell exists and extract workout details
+//        
+//        if let acceptCell = activeWorkoutCell as? AcceptChallengedCell {
+//            let workoutTitle = acceptCell.workoutTitle.text ?? "Workout"
+//            let workoutDescriptionText = acceptCell.workoutDescription.text ?? ""
+//
+//            // Extract the duration number from workoutDescription
+//            let duration = extractDuration(from: workoutDescriptionText)
+//
+//            // Update timerView with the extracted workout details
+//            timerView.workoutTitle.text = workoutTitle
+//            timerView.workoutDescription.text = workoutDescriptionText
+//            timerView.workoutNumberLabel.text = "\(duration) Sec"
+//
+//            // Start the countdown timer
+//            startCountdownTimer(with: duration)
+//        }
+//    }
     private func getTimerWorkout() {
         // Get the AcceptChallengedCell as the active workout view
         activeWorkoutCell = collectionView.cellForItem(at: IndexPath(item: 0, section: 0)) as? AcceptChallengedCell
-
         // Show timerView and hide the tab bar
         timerView.isHidden = false
         tabBarController?.tabBar.isHidden = true
-
         // Ensure AcceptChallengedCell exists and extract workout details
         if let acceptCell = activeWorkoutCell as? AcceptChallengedCell {
             let workoutTitle = acceptCell.workoutTitle.text ?? "Workout"
-            let workoutDescriptionText = acceptCell.workoutDescription.text ?? ""
+            // Find the workout from the list
+            if let selectedWorkout = workouts.first(where: { $0.title == workoutTitle }) {
+                let duration = selectedWorkout.duration
+                // Update timerView with the extracted workout details
+                timerView.workoutTitle.text = workoutTitle
+                timerView.workoutDescription.text = "\(selectedWorkout.description) (\(duration) Sec)"
+                timerView.workoutNumberLabel.text = "\(duration) Sec"
 
-            // Extract the duration number from workoutDescription
-            let duration = extractDuration(from: workoutDescriptionText)
-
-            // Update timerView with the extracted workout details
-            timerView.workoutTitle.text = workoutTitle
-            timerView.workoutDescription.text = workoutDescriptionText
-            timerView.workoutNumberLabel.text = "\(duration) Sec"
-
-            // Start the countdown timer
-            startCountdown(with: duration)
+                // Start the countdown timer
+                startCountdownTimer(with: duration)
+            } else {
+                print("Error: Workout not found in the list")
+            }
         }
     }
+
 
     //TODO: need update correct timer number
     private func extractDuration(from text: String) -> Int {
@@ -162,10 +221,10 @@ class CompetitionController: UIViewController {
                 return number
             }
         }
-        return 30 
+        return 30
     }
 
-    private func startCountdown(with duration: Int) {
+    private func startCountdownTimer(with duration: Int) {
         countdownTimer?.invalidate()
         countdownTimer = nil
 
@@ -216,6 +275,15 @@ class CompetitionController: UIViewController {
                 self.timerView.startButton.addTarget(self, action: #selector(self.hideTimerView), for: .touchUpInside)
             }
         }
+    }
+
+    private func stopTimerAndHideView() {
+//        workoutTimer?.invalidate()
+        countdownTimer?.invalidate()
+//        workoutTimer = nil
+        countdownTimer = nil
+        timerView.isHidden = true
+        tabBarController?.tabBar.isHidden = false
     }
 
     @objc private func hideTimerView() {
