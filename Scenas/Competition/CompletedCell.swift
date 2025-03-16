@@ -222,7 +222,7 @@ class CompletedCell: UICollectionViewCell {
 
         revancheButton.snp.remakeConstraints { make in
             make.bottom.equalTo(userViewBackground.snp.bottom).offset(-20 * Constraint.yCoeff)
-            make.leading.trailing.equalToSuperview().inset(20 * Constraint.xCoeff)
+            make.leading.trailing.equalTo(userViewBackground).inset(20 * Constraint.xCoeff)
             make.height.equalTo(60 * Constraint.yCoeff)
         }
 

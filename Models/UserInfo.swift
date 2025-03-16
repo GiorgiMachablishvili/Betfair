@@ -1,9 +1,3 @@
-//
-//  ChallengeUserInfo.swift
-//  Betfair
-//
-//  Created by Gio's Mac on 06.03.25.
-//
 
 
 import Foundation

@@ -1,9 +1,4 @@
-//
-//  WinCountView.swift
-//  Betfair
-//
-//  Created by Gio's Mac on 07.03.25.
-//
+
 
 import UIKit
 import SnapKit
