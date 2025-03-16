@@ -52,12 +52,12 @@ class NumberOfDaysWorkouts: UIView {
         dailyImage.snp.remakeConstraints { make in
             make.top.equalTo(workoutDaysBackground.snp.top).offset(22 * Constraint.yCoeff)
             make.centerX.equalTo(workoutDaysBackground)
-            make.height.equalTo(52 * Constraint.yCoeff)
-            make.width.equalTo(43 * Constraint.xCoeff)
+            make.height.equalTo(72 * Constraint.yCoeff)
+            make.width.equalTo(63 * Constraint.xCoeff)
         }
 
         titleLabel.snp.remakeConstraints { make in
-            make.top.equalTo(dailyImage.snp.bottom).offset(4 * Constraint.yCoeff)
+            make.bottom.equalTo(workoutDaysBackground.snp.bottom).offset(-22 * Constraint.yCoeff)
             make.leading.trailing.equalToSuperview().inset(27 * Constraint.xCoeff)
         }
     }

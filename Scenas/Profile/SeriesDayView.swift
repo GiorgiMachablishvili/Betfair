@@ -66,13 +66,13 @@ class SeriesDayView: UIView {
         seriesImage.snp.remakeConstraints { make in
             make.centerX.equalTo(seriesBackground)
             make.top.equalTo(seriesBackground.snp.top).offset(22 * Constraint.yCoeff)
-            make.height.equalTo(52 * Constraint.yCoeff)
-            make.width.equalTo(44 * Constraint.xCoeff)
+            make.height.equalTo(82 * Constraint.yCoeff)
+            make.width.equalTo(73 * Constraint.xCoeff)
         }
 
         daysLabel.snp.remakeConstraints { make in
             make.centerX.equalTo(seriesBackground)
-            make.top.equalTo(seriesImage.snp.bottom).offset(4 * Constraint.yCoeff)
+            make.bottom.equalTo(seriesBackground.snp.bottom).offset(-30 * Constraint.yCoeff)
         }
 
         yourSeriesLabel.snp.remakeConstraints { make in

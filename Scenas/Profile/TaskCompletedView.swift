@@ -72,7 +72,7 @@ class TaskCompletedView: UIView {
 
         taskLabel.snp.remakeConstraints { make in
             make.centerX.equalTo(seriesBackground)
-            make.top.equalTo(tasksImage.snp.bottom).offset(4 * Constraint.yCoeff)
+            make.bottom.equalTo(seriesBackground.snp.bottom).offset(-30 * Constraint.yCoeff)
         }
 
         completedLabel.snp.remakeConstraints { make in

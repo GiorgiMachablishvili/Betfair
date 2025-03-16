@@ -29,7 +29,7 @@ class TopView: UIView {
     lazy var numberOfDaysLabel: UILabel = {
         let view = UILabel(frame: .zero)
         view.numberOfLines = 0
-        view.attributedText = makeTopViewAttributedString(for: "2")
+        view.attributedText = makeTopViewAttributedString(for: "1")
         view.textAlignment = .left
         return view
     }()
