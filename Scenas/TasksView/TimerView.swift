@@ -91,6 +91,13 @@ class TimerView: UIView {
         return view
     }()
 
+    lazy var progressView: CircularProgressView = {
+        let view = CircularProgressView()
+        view.trackColor = UIColor.lightGray.withAlphaComponent(0.3)
+        view.progressColor = UIColor.mainViewsBackgroundYellow
+        return view
+    }()
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         setup()
@@ -112,6 +119,7 @@ class TimerView: UIView {
         addSubview(workoutDescription)
         addSubview(startButton)
         addSubview(closeButton)
+        addSubview(progressView)
     }
 
     private func setupConstraints() {
@@ -167,6 +175,11 @@ class TimerView: UIView {
             make.top.equalTo(workoutBackground.snp.bottom).offset(8 * Constraint.yCoeff)
             make.leading.trailing.equalToSuperview().inset(16 * Constraint.xCoeff)
             make.height.equalTo(60 * Constraint.yCoeff)
+        }
+
+        progressView.snp.makeConstraints { make in
+            make.center.equalTo(workoutNumberView)
+            make.width.height.equalTo(120 * Constraint.yCoeff)
         }
     }
 
