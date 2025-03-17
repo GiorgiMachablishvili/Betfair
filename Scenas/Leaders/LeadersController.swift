@@ -154,7 +154,7 @@ extension LeadersController: UISearchBarDelegate {
                 $0.userName.lowercased().contains(searchText.lowercased())
             }
         }
-        collectionView.reloadData() // 🔄 Refresh the list
+        collectionView.reloadData()
     }
 
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {

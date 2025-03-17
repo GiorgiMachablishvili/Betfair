@@ -15,6 +15,12 @@ class TimerView: UIView {
         return view
     }()
 
+    private lazy var yellowWhiteBackground: UIImageView = {
+        let view = UIImageView(frame: .zero)
+        view.image = UIImage(named: "yellowWhiteBackgroound")
+        return view
+    }()
+
     private lazy var workoutBackgroundCircle: UIImageView = {
         let view = UIImageView(frame: .zero)
         view.image = UIImage(named: "yellowCircle")
@@ -85,6 +91,13 @@ class TimerView: UIView {
         return view
     }()
 
+    lazy var progressView: CircularProgressView = {
+        let view = CircularProgressView()
+        view.trackColor = UIColor.lightGray.withAlphaComponent(0.3)
+        view.progressColor = UIColor.mainViewsBackgroundYellow
+        return view
+    }()
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         setup()
@@ -98,6 +111,7 @@ class TimerView: UIView {
     private func setup() {
         addSubview(viewMainBackground)
         addSubview(workoutBackground)
+        addSubview(yellowWhiteBackground)
         addSubview(workoutBackgroundCircle)
         addSubview(workoutNumberView)
         addSubview(workoutNumberLabel)
@@ -105,6 +119,7 @@ class TimerView: UIView {
         addSubview(workoutDescription)
         addSubview(startButton)
         addSubview(closeButton)
+        addSubview(progressView)
     }
 
     private func setupConstraints() {
@@ -116,6 +131,11 @@ class TimerView: UIView {
             make.top.equalTo(viewMainBackground.snp.top).offset(355 * Constraint.yCoeff)
             make.leading.trailing.equalToSuperview().inset(16 * Constraint.xCoeff)
             make.height.equalTo(389 * Constraint.yCoeff)
+        }
+
+        yellowWhiteBackground.snp.remakeConstraints { make in
+            make.leading.top.trailing.equalTo(workoutBackground)
+            make.height.equalTo(212 * Constraint.yCoeff)
         }
 
         workoutBackgroundCircle.snp.remakeConstraints { make in
@@ -155,6 +175,11 @@ class TimerView: UIView {
             make.top.equalTo(workoutBackground.snp.bottom).offset(8 * Constraint.yCoeff)
             make.leading.trailing.equalToSuperview().inset(16 * Constraint.xCoeff)
             make.height.equalTo(60 * Constraint.yCoeff)
+        }
+
+        progressView.snp.makeConstraints { make in
+            make.center.equalTo(workoutNumberView)
+            make.width.height.equalTo(120 * Constraint.yCoeff)
         }
     }
 

@@ -1,9 +1,4 @@
-//
-//  WinCountView.swift
-//  Betfair
-//
-//  Created by Gio's Mac on 07.03.25.
-//
+
 
 import UIKit
 import SnapKit
@@ -71,13 +66,13 @@ class WinCountView: UIView {
         winImage.snp.remakeConstraints { make in
             make.centerX.equalTo(seriesBackground)
             make.top.equalTo(seriesBackground.snp.top).offset(22 * Constraint.yCoeff)
-            make.height.equalTo(52 * Constraint.yCoeff)
-            make.width.equalTo(44 * Constraint.xCoeff)
+            make.height.equalTo(82 * Constraint.yCoeff)
+            make.width.equalTo(82 * Constraint.xCoeff)
         }
 
         winLabel.snp.remakeConstraints { make in
             make.centerX.equalTo(seriesBackground)
-            make.top.equalTo(winImage.snp.bottom).offset(4 * Constraint.yCoeff)
+            make.bottom.equalTo(seriesBackground.snp.bottom).offset(-30 * Constraint.yCoeff)
         }
 
         completedLabel.snp.remakeConstraints { make in

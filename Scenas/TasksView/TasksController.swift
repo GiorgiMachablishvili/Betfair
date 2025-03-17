@@ -97,97 +97,59 @@ class TasksController: UIViewController {
     }
 
     private func getStartFirstWorkout() {
+        stopTimerAndReset() // Stop any running timers and reset UI
         activeWorkoutView = chooseFirstWorkoutView
         timerView.isHidden = false
         tabBarController?.tabBar.isHidden = true
+
         if let selectedWorkout = workouts.first(where: { $0.title == chooseFirstWorkoutView.workoutTitle.text }) {
             timerView.workoutTitle.text = selectedWorkout.title
             timerView.workoutDescription.text = "\(selectedWorkout.description) (\(selectedWorkout.duration) sec)"
             timerView.workoutNumberLabel.text = "\(selectedWorkout.duration) Sec"
         }
+        startCountdown()
     }
 
     private func getStartSecondWorkout() {
+        stopTimerAndReset()
         activeWorkoutView = chooseSecondWorkoutView
         timerView.isHidden = false
         tabBarController?.tabBar.isHidden = true
+
         if let selectedWorkout = workouts.first(where: { $0.title == chooseSecondWorkoutView.workoutTitle.text }) {
             timerView.workoutTitle.text = selectedWorkout.title
             timerView.workoutDescription.text = "\(selectedWorkout.description) (\(selectedWorkout.duration) sec)"
             timerView.workoutNumberLabel.text = "\(selectedWorkout.duration) Sec"
         }
+        startCountdown()
     }
 
     private func getStartThirdWorkout() {
+        stopTimerAndReset()
         activeWorkoutView = chooseThirdWorkoutView
         timerView.isHidden = false
         tabBarController?.tabBar.isHidden = true
+
         if let selectedWorkout = workouts.first(where: { $0.title == chooseThirdWorkoutView.workoutTitle.text }) {
             timerView.workoutTitle.text = selectedWorkout.title
             timerView.workoutDescription.text = "\(selectedWorkout.description) (\(selectedWorkout.duration) sec)"
             timerView.workoutNumberLabel.text = "\(selectedWorkout.duration) Sec"
         }
+        startCountdown()
     }
 
-
-//    private func startCountdown() {
-//        timerView.startButton.setTitle("Reinvented", for: .normal)
-//        timerView.startButton.isUserInteractionEnabled = false
-//        timerView.startButton.backgroundColor = UIColor.mainViewsBackgroundYellow.withAlphaComponent(0.3)
-//
-//        if let selectedWorkout = workouts.first(where: { $0.title == chooseFirstWorkoutView.workoutTitle.text }) {
-//            let countdownNumbers = ["3", "2", "1", "GO", "\(selectedWorkout.duration)"]
-//
-//            // Show countdown numbers one by one
-//            for (index, number) in countdownNumbers.enumerated() {
-//                DispatchQueue.main.asyncAfter(deadline: .now() + Double(index)) {
-//                    self.timerView.workoutNumberLabel.text = number
-//
-//                    // After "GO", start the workout timer
-//                    if number == "GO" {
-//                        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-//                            self.startWorkoutTimer()
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//    }
-
-//    private func startCountdown() {
-//        // Stop any existing countdown timer
-//        countdownTimer?.invalidate()
-//        countdownTimer = nil
-//
-//        timerView.startButton.setTitle("Reinvented", for: .normal)
-//        timerView.startButton.isUserInteractionEnabled = false
-//        timerView.startButton.backgroundColor = UIColor.mainViewsBackgroundYellow.withAlphaComponent(0.3)
-//
-//        let countdownNumbers = ["3", "2", "1", "GO"]
-//        var index = 0
-//
-//        // Start a fresh countdown
-//        countdownTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
-//            if index < countdownNumbers.count {
-//                self.timerView.workoutNumberLabel.text = countdownNumbers[index]
-//                index += 1
-//            } else {
-//                timer.invalidate()
-//                self.countdownTimer = nil
-//
-//                // After "GO", start the workout timer
-//                if let selectedWorkout = workouts.first(where: { $0.title == self.chooseFirstWorkoutView.workoutTitle.text }) {
-//                    self.startWorkoutTimer(duration: selectedWorkout.duration)
-//                }
-//            }
-//        }
-//    }
-
     private func startCountdown() {
+        // If the button title is "Reinvented", reset everything before starting
+        if timerView.startButton.title(for: .normal) == "Reinvented" {
+            stopTimerAndReset()
+            return // Stop execution and wait for user to start fresh
+        }
+
         // Stop any existing countdown timer
         countdownTimer?.invalidate()
         countdownTimer = nil
 
+        // Update button state
         timerView.startButton.setTitle("Reinvented", for: .normal)
         timerView.startButton.isUserInteractionEnabled = false
         timerView.startButton.backgroundColor = UIColor.mainViewsBackgroundYellow.withAlphaComponent(0.3)
@@ -195,7 +157,7 @@ class TasksController: UIViewController {
         let countdownNumbers = ["3", "2", "1", "GO"]
         var index = 0
 
-        // Find the correct workout based on `activeWorkoutView`
+        // Determine the active workout
         let selectedWorkoutTitle: String?
         if activeWorkoutView == chooseFirstWorkoutView {
             selectedWorkoutTitle = chooseFirstWorkoutView.workoutTitle.text
@@ -207,29 +169,53 @@ class TasksController: UIViewController {
             selectedWorkoutTitle = nil
         }
 
-        // Find the matching workout
         guard let workoutTitle = selectedWorkoutTitle,
               let selectedWorkout = workouts.first(where: { $0.title == workoutTitle }) else { return }
 
-        // Start a fresh countdown
+        // Reset progress view
+        timerView.progressView.setProgress(to: 0)
+
+        // Start countdown timer
         countdownTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
             if index < countdownNumbers.count {
+                let progress = CGFloat(index + 1) / CGFloat(countdownNumbers.count)
+                UIView.animate(withDuration: 0.9) {
+                    self.timerView.progressView.setProgress(to: progress)
+                }
                 self.timerView.workoutNumberLabel.text = countdownNumbers[index]
                 index += 1
             } else {
                 timer.invalidate()
                 self.countdownTimer = nil
-
-                // After "GO", start the workout timer
                 self.startWorkoutTimer(duration: selectedWorkout.duration)
             }
         }
     }
 
+    private func stopTimerAndReset() {
+        // Invalidate existing timers
+        workoutTimer?.invalidate()
+        countdownTimer?.invalidate()
+        workoutTimer = nil
+        countdownTimer = nil
+
+        // Reset progress view
+        timerView.progressView.setProgress(to: 0)
+
+        // Reset UI
+        timerView.workoutNumberLabel.text = "3"
+        timerView.workoutTitle.text = "Get Ready!"
+        timerView.workoutDescription.text = "Countdown to Start"
+        timerView.startButton.setTitle("Start", for: .normal)
+        timerView.startButton.isUserInteractionEnabled = true
+        timerView.startButton.backgroundColor = UIColor.mainViewsBackgroundYellow
+
+        activeWorkoutView?.isHidden = false
+        activeWorkoutView = nil
+    }
 
 
     private func startWorkoutTimer(duration: Int) {
-        // Stop any existing workout timer before starting a new one
         workoutTimer?.invalidate()
         workoutTimer = nil
 
@@ -239,10 +225,17 @@ class TasksController: UIViewController {
         var timeRemaining = duration
         timerView.workoutNumberLabel.text = "\(timeRemaining)"
 
+        // Reset progress
+        timerView.progressView.setProgress(to: 1.0)
+
         workoutTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
             if timeRemaining > 0 {
                 timeRemaining -= 1
                 self.timerView.workoutNumberLabel.text = "\(timeRemaining)"
+                let progress = CGFloat(timeRemaining) / CGFloat(duration)
+                UIView.animate(withDuration: 0.9) {
+                    self.timerView.progressView.setProgress(to: progress)
+                }
             } else {
                 timer.invalidate()
                 self.workoutTimer = nil
@@ -250,12 +243,10 @@ class TasksController: UIViewController {
                 self.timerView.workoutTitle.text = "Completed!"
                 self.timerView.workoutDescription.text = "You did a great job"
                 self.timerView.startButton.setTitle("Okey", for: .normal)
-
                 self.timerView.startButton.addTarget(self, action: #selector(self.hideTimerView), for: .touchUpInside)
             }
         }
     }
-
 
     private func stopTimerAndHideView() {
         workoutTimer?.invalidate()
@@ -266,32 +257,6 @@ class TasksController: UIViewController {
         tabBarController?.tabBar.isHidden = false
     }
 
-
-//    private func startWorkoutTimer() {
-//        timerView.startButton.isUserInteractionEnabled = true
-//        timerView.startButton.backgroundColor = UIColor.mainViewsBackgroundYellow
-//
-//        guard let durationText = timerView.workoutNumberLabel.text?.components(separatedBy: " ").first,
-//              let duration = Int(durationText) else { return }
-//
-//        var timeRemaining = duration
-//        timerView.workoutNumberLabel.text = "\(timeRemaining)"
-//
-//        Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
-//            if timeRemaining > 0 {
-//                timeRemaining -= 1
-//                self.timerView.workoutNumberLabel.text = "\(timeRemaining)"
-//            } else {
-//                timer.invalidate()
-//                self.timerView.workoutNumberLabel.text = "✔️"
-//                self.timerView.workoutTitle.text = "Completed!"
-//                self.timerView.workoutDescription.text = "You did a great job"
-//                self.timerView.startButton.setTitle("Okey", for: .normal)
-//
-//                self.timerView.startButton.addTarget(self, action: #selector(self.hideTimerView), for: .touchUpInside)
-//            }
-//        }
-//    }
     @objc private func hideTimerView() {
         timerView.isHidden = true
         tabBarController?.tabBar.isHidden = false
