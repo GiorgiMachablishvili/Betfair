@@ -42,7 +42,13 @@ class TasksController: UIViewController {
     private lazy var timerView: TimerView = {
         let view = TimerView()
         view.didPressStartedButton = { [weak self] in
-            self?.startCountdown()
+            if self?.timerView.startButton.title(for: .normal) == "Reinvented" {
+                self?.stopTimerAndReset()
+                self?.startCountdown()
+            } else {
+                self?.startCountdown()
+            }
+//            self?.startCountdown()
         }
         view.didPressCloseButton = { [weak self] in
             self?.stopTimerAndHideView()
@@ -138,12 +144,14 @@ class TasksController: UIViewController {
         startCountdown()
     }
 
+    //TODO: when press Reinvented does not starts timer again cooldown
     private func startCountdown() {
         // If the button title is "Reinvented", reset everything before starting
-        if timerView.startButton.title(for: .normal) == "Reinvented" {
-            stopTimerAndReset()
-            return // Stop execution and wait for user to start fresh
-        }
+//        if timerView.startButton.title(for: .normal) == "Reinvented" {
+//            stopTimerAndReset()
+//            startCountdown()
+//            return // Stop execution and wait for user to start fresh
+//        }
 
         // Stop any existing countdown timer
         countdownTimer?.invalidate()
@@ -199,7 +207,6 @@ class TasksController: UIViewController {
         workoutTimer = nil
         countdownTimer = nil
 
-        // Reset progress view
         timerView.progressView.setProgress(to: 0)
 
         // Reset UI
@@ -228,14 +235,18 @@ class TasksController: UIViewController {
         // Reset progress
         timerView.progressView.setProgress(to: 1.0)
 
-        workoutTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
+        let totalDuration = CGFloat(duration)
+        var elapsedTime: CGFloat = 0.0
+
+        workoutTimer  = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
             if timeRemaining > 0 {
                 timeRemaining -= 1
+                elapsedTime += 1.0
                 self.timerView.workoutNumberLabel.text = "\(timeRemaining)"
-                let progress = CGFloat(timeRemaining) / CGFloat(duration)
-                UIView.animate(withDuration: 0.9) {
-                    self.timerView.progressView.setProgress(to: progress)
-                }
+
+                // Update circular progress
+                let progress = elapsedTime / totalDuration
+                self.timerView.progressView.setProgress(to: progress)
             } else {
                 timer.invalidate()
                 self.workoutTimer = nil

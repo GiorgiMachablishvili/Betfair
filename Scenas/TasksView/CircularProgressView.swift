@@ -38,18 +38,31 @@ class CircularProgressView: UIView {
         progressLayer.fillColor = UIColor.clear.cgColor
         progressLayer.strokeColor = progressColor.cgColor
         progressLayer.lineWidth = 10 * Constraint.xCoeff
-        progressLayer.strokeEnd = 1.0
+        progressLayer.strokeEnd = 0.0
         progressLayer.lineCap = .round
         layer.addSublayer(progressLayer)
     }
 
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        setupLayers()
-    }
+//    override func layoutSubviews() {
+//        super.layoutSubviews()
+//        setupLayers()
+//    }
+//
+//    func setProgress(to progress: CGFloat) {
+//        progressLayer.strokeEnd = progress
+//    }
 
-    func setProgress(to progress: CGFloat) {
-        progressLayer.strokeEnd = progress
-    }
+    override func layoutSubviews() {
+            super.layoutSubviews()
+            layer.sublayers?.forEach { $0.removeFromSuperlayer() }
+            setupLayers()
+        }
+
+        func setProgress(to progress: CGFloat, animated: Bool = true) {
+            CATransaction.begin()
+            CATransaction.setAnimationDuration(animated ? 0.3 : 0.0) // Smooth transition
+            progressLayer.strokeEnd = progress
+            CATransaction.commit()
+        }
 }
 
