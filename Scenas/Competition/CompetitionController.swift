@@ -5,6 +5,8 @@ import SnapKit
 
 class CompetitionController: UIViewController {
 
+    private let viewModel = CompetitionViewModel()
+
     private var isShowingActive: Bool = true
     private var isAcceptChallengedViewVisible: Bool = false
 
@@ -32,10 +34,12 @@ class CompetitionController: UIViewController {
     private lazy var competitionTopView: CompetitionTopView = {
         let view = CompetitionTopView()
         view.didPressActiveButton = { [weak self] in
-            self?.activeOpponentButton()
+//            self?.activeOpponentButton()
+            self?.viewModel.activeOpponentButton()
         }
         view.didPressCompletedButton = { [weak self] in
-            self?.completedButton()
+//            self?.completedButton()
+            self?.viewModel.completedButton()
         }
         return view
     }()
@@ -79,6 +83,7 @@ class CompetitionController: UIViewController {
 
         setup()
         setupConstraint()
+        setupBindings()
     }
     
 
@@ -109,16 +114,18 @@ class CompetitionController: UIViewController {
         }
     }
 
-    private func activeOpponentButton() {
-        isShowingActive = true
-        isAcceptChallengedViewVisible = false
-        updateUI()
-    }
+    func setupBindings() {
+        viewModel.onActiveOpponentButton = { [weak self] in
+            self?.isShowingActive = true
+            self?.isAcceptChallengedViewVisible = false
+            self?.updateUI()
+        }
 
-    private func completedButton() {
-        isShowingActive = false
-        isAcceptChallengedViewVisible = false
-        updateUI()
+        viewModel.onCompletedButton = { [weak self] in
+            self?.isShowingActive = false
+            self?.isAcceptChallengedViewVisible = false
+            self?.updateUI()
+        }
     }
 
     private func updateUI() {
@@ -128,17 +135,17 @@ class CompetitionController: UIViewController {
 
     private func updateButtonStyles() {
         if isShowingActive {
-            competitionTopView.activeButton.backgroundColor = .white
-            competitionTopView.activeButton.setTitleColor(.black, for: .normal)
+            competitionTopView.activeButton.backgroundColor = .whiteColor
+            competitionTopView.activeButton.setTitleColor(.blackColor, for: .normal)
 
             competitionTopView.completedButton.backgroundColor = UIColor.white.withAlphaComponent(0.2)
-            competitionTopView.completedButton.setTitleColor(.white, for: .normal)
+            competitionTopView.completedButton.setTitleColor(.whiteColor, for: .normal)
         } else {
-            competitionTopView.completedButton.backgroundColor = .white
-            competitionTopView.completedButton.setTitleColor(.black, for: .normal)
+            competitionTopView.completedButton.backgroundColor = .whiteColor
+            competitionTopView.completedButton.setTitleColor(.blackColor, for: .normal)
 
-            competitionTopView.activeButton.backgroundColor = UIColor.white.withAlphaComponent(0.2)
-            competitionTopView.activeButton.setTitleColor(.white, for: .normal)
+            competitionTopView.activeButton.backgroundColor = UIColor.whiteColor.withAlphaComponent(0.2)
+            competitionTopView.activeButton.setTitleColor(.whiteColor, for: .normal)
         }
     }
 
