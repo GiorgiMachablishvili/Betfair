@@ -169,7 +169,7 @@ class ChooseFirstWorkoutView: UIView {
 
         return attributedString
     }
-    
+
     private func loadRandomWorkout() {
         guard let randomWorkout = workouts.randomElement() else { return }
         workoutTitle.text = randomWorkout.title
