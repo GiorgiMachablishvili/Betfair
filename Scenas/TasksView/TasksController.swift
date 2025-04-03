@@ -96,10 +96,32 @@ class TasksController: UIViewController {
         }
     }
 
+//    private func restartCountdownFromButton() {
+//        stopTimersOnly()
+//
+//        // Clear any completed workout state
+//        timerView.workoutNumberLabel.text = "3"
+//        timerView.workoutTitle.text = "Get Ready!"
+//        timerView.workoutDescription.text = "Countdown to Start"
+//        timerView.startButton.setTitle("Reinvented", for: .normal)
+//        timerView.startButton.isUserInteractionEnabled = false
+//        timerView.startButton.backgroundColor = UIColor.mainViewsBackgroundYellow.withAlphaComponent(0.3)
+//
+//        startCountdown()
+//    }
+
     private func restartCountdownFromButton() {
         stopTimersOnly()
 
-        // Clear any completed workout state
+        guard let activeView = activeWorkoutView else {
+            print("No active workout view. Cannot restart countdown.")
+            return
+        }
+
+        // ✅ Make sure it's visible (could be hidden after hiding timer)
+        activeView.isHidden = false
+
+        // Reset the timerView to initial state
         timerView.workoutNumberLabel.text = "3"
         timerView.workoutTitle.text = "Get Ready!"
         timerView.workoutDescription.text = "Countdown to Start"
@@ -111,6 +133,7 @@ class TasksController: UIViewController {
     }
 
 
+
     private func getStartFirstWorkout() {
         stopTimerAndReset()
         activeWorkoutView = chooseFirstWorkoutView
@@ -120,13 +143,23 @@ class TasksController: UIViewController {
     }
 
     //TODO: when press Reinvented does not starts timer again cooldown
+//    private func getStartSecondWorkout() {
+//        stopTimerAndReset()
+//        activeWorkoutView = chooseSecondWorkoutView
+//        timerView.isHidden = false
+//        tabBarController?.tabBar.isHidden = true
+//        startCountdown()
+//    }
+
     private func getStartSecondWorkout() {
         stopTimerAndReset()
         activeWorkoutView = chooseSecondWorkoutView
+        activeWorkoutView?.isHidden = false // ✅ Ensure visibility
         timerView.isHidden = false
         tabBarController?.tabBar.isHidden = true
         startCountdown()
     }
+
 
     private func getStartThirdWorkout() {
         stopTimerAndReset()
@@ -201,7 +234,7 @@ class TasksController: UIViewController {
         timerView.startButton.backgroundColor = UIColor.mainViewsBackgroundYellow
 
         activeWorkoutView?.isHidden = false
-        activeWorkoutView = nil
+//        activeWorkoutView = nil
     }
 
     private func startWorkoutTimer(duration: Int) {
@@ -233,8 +266,12 @@ class TasksController: UIViewController {
                 self.timerView.workoutNumberLabel.text = "✔️"
                 self.timerView.workoutTitle.text = "Completed!"
                 self.timerView.workoutDescription.text = "You did a great job"
+//                self.timerView.startButton.setTitle("Okey", for: .normal)
+//                self.timerView.startButton.addTarget(self, action: #selector(self.hideTimerView), for: .touchUpInside)
                 self.timerView.startButton.setTitle("Okey", for: .normal)
-                self.timerView.startButton.addTarget(self, action: #selector(self.hideTimerView), for: .touchUpInside)
+                self.timerView.didPressStartedButton = { [weak self] in
+                    self?.hideTimerView()
+                }
             }
         }
     }

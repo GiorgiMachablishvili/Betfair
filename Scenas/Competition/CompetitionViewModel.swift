@@ -13,6 +13,7 @@ class CompetitionViewModel {
     var onCompletedButton: (() -> Void)?
     var onHideAcceptChallengedView: (() -> Void)?
     var onShowAcceptChallengedView: (() -> Void)?
+    var onStartTimerForWorkout: ((TrainingModelCS) -> Void)?
 
     private var isShowingActive: Bool = true
 
@@ -34,6 +35,17 @@ class CompetitionViewModel {
     func showAcceptChallengedView() {
         onShowAcceptChallengedView?()
     }
+
+    func startTimerForWorkout(with title: String?, in workouts: [TrainingModelCS]) {
+        guard let title = title,
+              let selectedWorkout = workouts.first(where: { $0.title == title }) else {
+            print("Workout not found in ViewModel")
+            return
+        }
+
+        onStartTimerForWorkout?(selectedWorkout)
+    }
+
 
     func updateButtonStyles(competitionTopView: CompetitionTopView) {
         if isShowingActive {

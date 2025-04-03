@@ -71,16 +71,23 @@ class CompetitionController: UIViewController {
 //    }()
 
     private lazy var timerView: TimerView = {
-            let view = TimerView()
-            view.didPressStartedButton = { [weak self] in
-                self?.startTimerForWorkout()
-            }
-            view.didPressCloseButton = { [weak self] in
-                self?.stopTimerAndHideView()
-            }
-            view.isHidden = true
-            return view
-        }()
+        let view = TimerView()
+        //            view.didPressStartedButton = { [weak self] in
+        ////                self?.startTimerForWorkout()
+        //                self?.viewModel.startTimerForWorkout()
+        //            }
+        view.didPressStartedButton = { [weak self] in
+            guard let self = self else { return }
+            guard let cell = self.activeWorkoutCell as? AcceptChallengedCell else { return }
+            let workoutTitle = cell.workoutTitle.text
+            self.viewModel.startTimerForWorkout(with: workoutTitle, in: workouts)
+        }
+        view.didPressCloseButton = { [weak self] in
+            self?.stopTimerAndHideView()
+        }
+        view.isHidden = true
+        return view
+    }()
 
     private lazy var doNotHaveChallengesView: DoNotHaveChallengesView = {
         let view = DoNotHaveChallengesView()
@@ -148,6 +155,10 @@ class CompetitionController: UIViewController {
             self?.isAcceptChallengedViewVisible = true
             self?.updateUI()
         }
+
+        viewModel.onStartTimerForWorkout = { [weak self] selectedWorkout in
+            self?.handleStartWorkout(with: selectedWorkout)
+        }
     }
 
     private func updateUI() {
@@ -155,20 +166,29 @@ class CompetitionController: UIViewController {
         collectionView.reloadData()
     }
 
-    private func startTimerForWorkout() {
-            guard let acceptCell = activeWorkoutCell as? AcceptChallengedCell,
-                  let workoutTitle = acceptCell.workoutTitle.text,
-                  let selectedWorkout = workouts.first(where: { $0.title == workoutTitle }) else {
-                print("Error: No active workout selected or workout not found")
-                return
-            }
+//    private func startTimerForWorkout() {
+//        guard let acceptCell = activeWorkoutCell as? AcceptChallengedCell,
+//              let workoutTitle = acceptCell.workoutTitle.text,
+//              let selectedWorkout = workouts.first(where: { $0.title == workoutTitle }) else {
+//            print("Error: No active workout selected or workout not found")
+//            return
+//        }
+//
+//        let duration = selectedWorkout.duration
+//        timerView.workoutTitle.text = workoutTitle
+//        timerView.workoutDescription.text = "\(selectedWorkout.description) (\(duration) Sec)"
+//        timerView.workoutNumberLabel.text = "\(duration) Sec"
+//        startCountdownTimer(with: duration, workoutTitle: workoutTitle)
+//    }
 
-            let duration = selectedWorkout.duration
-            timerView.workoutTitle.text = workoutTitle
-            timerView.workoutDescription.text = "\(selectedWorkout.description) (\(duration) Sec)"
-            timerView.workoutNumberLabel.text = "\(duration) Sec"
-            startCountdownTimer(with: duration, workoutTitle: workoutTitle)
-        }
+    private func handleStartWorkout(with workout: TrainingModelCS) {
+        let duration = workout.duration
+        timerView.workoutTitle.text = workout.title
+        timerView.workoutDescription.text = "\(workout.description) (\(duration) Sec)"
+        timerView.workoutNumberLabel.text = "\(duration) Sec"
+        startCountdownTimer(with: duration, workoutTitle: workout.title)
+    }
+
 
     //TODO: finish mvvm pattern
     private func getTimerWorkout() {
