@@ -1,9 +1,4 @@
-//
-//  CompetitionViewModel.swift
-//  Betfair
-//
-//  Created by Gio's Mac on 20.03.25.
-//
+
 
 import UIKit
 

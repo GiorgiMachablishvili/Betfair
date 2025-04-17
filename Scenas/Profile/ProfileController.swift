@@ -60,8 +60,6 @@ class ProfileController: UIViewController {
         return view
     }()
 
-
-
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .mainViewsBackgroundYellow
