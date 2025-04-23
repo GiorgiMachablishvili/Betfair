@@ -112,7 +112,7 @@ class TimerView: UIView {
         addSubview(viewMainBackground)
         addSubview(workoutBackground)
         addSubview(yellowWhiteBackground)
-        addSubview(workoutBackgroundCircle)
+//        addSubview(workoutBackgroundCircle)
         addSubview(workoutNumberView)
         addSubview(workoutNumberLabel)
         addSubview(workoutTitle)
@@ -138,10 +138,10 @@ class TimerView: UIView {
             make.height.equalTo(212 * Constraint.yCoeff)
         }
 
-        workoutBackgroundCircle.snp.remakeConstraints { make in
-            make.center.equalTo(workoutNumberView)
-            make.height.width.equalTo(140 * Constraint.yCoeff)
-        }
+//        workoutBackgroundCircle.snp.remakeConstraints { make in
+//            make.center.equalTo(workoutNumberView)
+//            make.height.width.equalTo(140 * Constraint.yCoeff)
+//        }
 
         workoutNumberView.snp.remakeConstraints { make in
             make.top.equalTo(workoutBackground.snp.top).offset(49 * Constraint.yCoeff)
@@ -179,7 +179,7 @@ class TimerView: UIView {
 
         progressView.snp.makeConstraints { make in
             make.center.equalTo(workoutNumberView)
-            make.width.height.equalTo(120 * Constraint.yCoeff)
+            make.width.height.equalTo(160 * Constraint.yCoeff)
         }
     }
 
