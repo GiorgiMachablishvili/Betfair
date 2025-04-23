@@ -99,7 +99,7 @@ class ComplaintView: UIView {
         }
 
         complaintBackground.snp.remakeConstraints { make in
-            make.top.equalTo(viewMainBackground.snp.top).offset(400 * Constraint.yCoeff)
+            make.top.equalTo(viewMainBackground.snp.top).offset(360 * Constraint.yCoeff)
             make.leading.trailing.equalToSuperview().inset(16 * Constraint.xCoeff)
             make.height.equalTo(340 * Constraint.yCoeff)
         }

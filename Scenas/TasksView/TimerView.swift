@@ -128,7 +128,7 @@ class TimerView: UIView {
         }
 
         workoutBackground.snp.makeConstraints { make in
-            make.top.equalTo(viewMainBackground.snp.top).offset(355 * Constraint.yCoeff)
+            make.top.equalTo(viewMainBackground.snp.top).offset(305 * Constraint.yCoeff)
             make.leading.trailing.equalToSuperview().inset(16 * Constraint.xCoeff)
             make.height.equalTo(389 * Constraint.yCoeff)
         }

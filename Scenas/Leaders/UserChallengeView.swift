@@ -10,7 +10,7 @@ class UserChallengeView: UIView {
 
     private lazy var viewMainBackground: UIView = {
         let view = UIView(frame: .zero)
-        view.backgroundColor = .clear.withAlphaComponent(0.3)
+        view.backgroundColor = .clear.withAlphaComponent(0.8)
         view.isUserInteractionEnabled = true
         return view
     }()
@@ -33,7 +33,7 @@ class UserChallengeView: UIView {
     lazy var nicknameLabel: UILabel = {
         let view = UILabel(frame: .zero)
         view.text = "Nickname"
-        view.textColor = UIColor.gayBackground
+        view.textColor = UIColor.gayBackground.withAlphaComponent(0.2)
         view.font = UIFont.poppinsBold(size: 10)
         view.textAlignment = .center
         return view
@@ -138,7 +138,7 @@ class UserChallengeView: UIView {
         }
 
         workoutBackground.snp.remakeConstraints { make in
-            make.top.equalTo(viewMainBackground.snp.top).offset(395 * Constraint.yCoeff)
+            make.top.equalTo(viewMainBackground.snp.top).offset(350 * Constraint.yCoeff)
             make.leading.trailing.equalToSuperview().inset(16 * Constraint.xCoeff)
             make.height.equalTo(350 * Constraint.yCoeff)
         }
@@ -213,6 +213,11 @@ class UserChallengeView: UIView {
         didPressColseButton?()
     }
 
+    func configure(with user: UserInfo) {
+        userImage.image = UIImage(named: user.image)
+        userNameLabel.text = user.userName
+        ratingNumberLabel.text = user.userRating
+    }
 }
 
 extension UIImage {

@@ -16,7 +16,7 @@ class ProfileTopView: UIView {
 
     private lazy var userImage: UIImageView = {
         let view = UIImageView(frame: .zero)
-        view.image = UIImage(named: "profile")
+        view.image = UIImage(named: "yellowCircle")
         view.contentMode = .scaleAspectFill
         view.makeRoundCorners(40)
         return view
@@ -59,11 +59,11 @@ class ProfileTopView: UIView {
 
     lazy var profileAddButton: UIButton = {
         let view = UIButton(frame: .zero)
-        view.setTitle("'''", for: .normal)
-        view.backgroundColor = UIColor.gayBackground.withAlphaComponent(0.5)
-        view.titleLabel?.font = UIFont.poppinsMedium(size: 14)
+        view.setImage(UIImage(named: "menuDots"), for: .normal)
+        view.backgroundColor = UIColor.whiteColor.withAlphaComponent(0.2)
         view.setTitleColor(UIColor.whiteColor, for: .normal)
         view.makeRoundCorners(22)
+        view.contentMode = .scaleAspectFit
         view.addTarget(self, action: #selector(clickProfileAddButton), for: .touchUpInside)
         return view
     }()

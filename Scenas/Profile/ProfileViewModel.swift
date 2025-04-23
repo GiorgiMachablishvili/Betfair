@@ -12,12 +12,12 @@ class ProfileViewModel {
 
     func loadUsers() {
         users = [
-            UserInfo(image: "user1", userName: "Alice", userRating: "1200"),
-            UserInfo(image: "user2", userName: "Bob", userRating: "1500"),
-            UserInfo(image: "user3", userName: "Charlie", userRating: "1800"),
-            UserInfo(image: "user4", userName: "Tom", userRating: "900"),
-            UserInfo(image: "user5", userName: "Non", userRating: "1000"),
-            UserInfo(image: "user6", userName: "Tat", userRating: "700")
+            UserInfo(image: "yellowCircle", userName: "Alice", userRating: "1200"),
+            UserInfo(image: "yellowCircle", userName: "Bob", userRating: "1500"),
+            UserInfo(image: "yellowCircle", userName: "Charlie", userRating: "1800"),
+            UserInfo(image: "yellowCircle", userName: "Tom", userRating: "900"),
+            UserInfo(image: "yellowCircle", userName: "Non", userRating: "1000"),
+            UserInfo(image: "yellowCircle", userName: "Tat", userRating: "700")
         ]
     }
 

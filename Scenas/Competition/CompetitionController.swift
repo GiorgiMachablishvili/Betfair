@@ -44,32 +44,6 @@ class CompetitionController: UIViewController {
         return view
     }()
 
-//    private lazy var timerView: TimerView = {
-//        let view = TimerView()
-//        view.didPressStartedButton = { [weak self] in
-//            guard let self = self else { return }
-//
-//            // Ensure activeWorkoutCell is of type AcceptChallengedCell
-//            if let acceptCell = self.activeWorkoutCell as? AcceptChallengedCell {
-//                let workoutTitle = acceptCell.workoutTitle.text
-//
-//                // Find the workout in the `workouts` array
-//                if let selectedWorkout = workouts.first(where: { $0.title == workoutTitle }) {
-//                    self.startCountdownTimer(with: selectedWorkout.duration)
-//                } else {
-//                    print("Error: Workout not found in the list")
-//                }
-//            } else {
-//                print("Error: No active workout selected")
-//            }
-//        }
-//        view.didPressCloseButton = { [weak self] in
-//            self?.stopTimerAndHideView()
-//        }
-//        view.isHidden = true
-//        return view
-//    }()
-
     private lazy var timerView: TimerView = {
         let view = TimerView()
         //            view.didPressStartedButton = { [weak self] in
@@ -300,36 +274,6 @@ class CompetitionController: UIViewController {
             }
         }
     }
-
-
-//    private func startWorkoutTimer(duration: Int) {
-//        // Stop any existing workout timer before starting a new one
-//        countdownTimer?.invalidate()
-//        countdownTimer = nil
-//
-//        timerView.startButton.isUserInteractionEnabled = true
-//        timerView.startButton.backgroundColor = UIColor.mainViewsBackgroundYellow
-//
-//        var timeRemaining = duration
-//        timerView.workoutNumberLabel.text = "\(timeRemaining)"
-//
-//        countdownTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
-//            if timeRemaining > 0 {
-//                timeRemaining -= 1
-//                self.timerView.workoutNumberLabel.text = "\(timeRemaining)"
-//            } else {
-//                timer.invalidate()
-//                self.countdownTimer = nil
-//                self.timerView.workoutNumberLabel.text = "✔️"
-//                self.timerView.workoutTitle.text = "Completed!"
-//                self.timerView.workoutDescription.text = "You did a great job!"
-//                self.timerView.startButton.setTitle("Okay", for: .normal)
-//
-//                // Add an action to close the timer view
-//                self.timerView.startButton.addTarget(self, action: #selector(self.hideTimerView), for: .touchUpInside)
-//            }
-//        }
-//    }
 
     private func stopTimerAndHideView() {
 //        workoutTimer?.invalidate()

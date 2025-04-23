@@ -109,7 +109,7 @@ class ChangeUserInfoView: UIView {
         }
 
         changeInfoBackground.snp.remakeConstraints { make in
-            make.top.equalTo(viewMainBackground.snp.top).offset(427 * Constraint.yCoeff)
+            make.top.equalTo(viewMainBackground.snp.top).offset(385 * Constraint.yCoeff)
             make.leading.trailing.equalToSuperview().inset(16 * Constraint.xCoeff)
             make.height.equalTo(309 * Constraint.yCoeff)
         }
