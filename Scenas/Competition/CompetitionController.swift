@@ -33,11 +33,9 @@ class CompetitionController: UIViewController {
     private lazy var competitionTopView: CompetitionTopView = {
         let view = CompetitionTopView()
         view.didPressActiveButton = { [weak self] in
-//            self?.activeOpponentButton()
             self?.viewModel.activeOpponentButton()
         }
         view.didPressCompletedButton = { [weak self] in
-//            self?.completedButton()
             self?.viewModel.completedButton()
         }
         return view
@@ -45,10 +43,6 @@ class CompetitionController: UIViewController {
 
     private lazy var timerView: TimerView = {
         let view = TimerView()
-        //            view.didPressStartedButton = { [weak self] in
-        ////                self?.startTimerForWorkout()
-        //                self?.viewModel.startTimerForWorkout()
-        //            }
         view.didPressStartedButton = { [weak self] in
             guard let self = self else { return }
             guard let cell = self.activeWorkoutCell as? AcceptChallengedCell else { return }
@@ -150,23 +144,17 @@ class CompetitionController: UIViewController {
 
     //TODO: finish mvvm pattern
     private func getTimerWorkout() {
-        // Get the AcceptChallengedCell as the active workout view
         activeWorkoutCell = collectionView.cellForItem(at: IndexPath(item: 0, section: 0)) as? AcceptChallengedCell
-        // Show timerView and hide the tab bar
         timerView.isHidden = false
         tabBarController?.tabBar.isHidden = true
-        // Ensure AcceptChallengedCell exists and extract workout details
         if let acceptCell = activeWorkoutCell as? AcceptChallengedCell {
             let workoutTitle = acceptCell.workoutTitle.text ?? "Workout"
-            // Find the workout from the list
             if let selectedWorkout = workouts.first(where: { $0.title == workoutTitle }) {
                 let duration = selectedWorkout.duration
-                // Update timerView with the extracted workout details
                 timerView.workoutTitle.text = workoutTitle
                 timerView.workoutDescription.text = "\(selectedWorkout.description) (\(duration) Sec)"
                 timerView.workoutNumberLabel.text = "\(duration) Sec"
 
-                // Start the countdown timer
                 startCountdownTimer(with: duration, workoutTitle: workoutTitle)
             } else {
                 print("Error: Workout not found in the list")
@@ -174,8 +162,6 @@ class CompetitionController: UIViewController {
         }
     }
 
-
-    //TODO: need update correct timer number
     private func extractDuration(from text: String) -> Int {
         let words = text.components(separatedBy: " ")
         for word in words {
@@ -250,10 +236,8 @@ class CompetitionController: UIViewController {
                 self.timerView.workoutDescription.text = "You did a great job!"
                 self.timerView.startButton.setTitle("Okay", for: .normal)
 
-                // Ensure full progress
                 self.timerView.progressView.setProgress(to: 1.0)
 
-                // Add action to close timer view
                 self.timerView.startButton.addTarget(self, action: #selector(self.hideTimerView), for: .touchUpInside)
             }
         }
@@ -272,48 +256,77 @@ class CompetitionController: UIViewController {
 
         if let acceptCell = activeWorkoutCell as? AcceptChallengedCell {
             acceptCell.loadRandomWorkout()
-//            if let currentNumber = Int(acceptCell.workoutNumberLabel.text ?? "0") {
-//                acceptCell.workoutNumberLabel.text = "\(currentNumber + 1)"
-//            }
         }
     }
 }
 
 extension CompetitionController: UICollectionViewDelegate, UICollectionViewDataSource {
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
         return 1
     }
 
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        switch section {
+        case 0:
+            if isAcceptChallengedViewVisible {
+                return 1
+            } else if isShowingActive {
+                return 1
+            } else {
+                return 3
+            }
+        default:
+            return 0
+        }
+    }
+
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        if isAcceptChallengedViewVisible {
-            // Show AcceptChallengedCell when challenge is accepted
-            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "AcceptChallengedCell", for: indexPath) as? AcceptChallengedCell else {
-                return UICollectionViewCell()
+        switch indexPath.section {
+        case 0:
+            if isAcceptChallengedViewVisible {
+                // AcceptChallengedCell
+                guard let cell = collectionView.dequeueReusableCell(
+                    withReuseIdentifier: "AcceptChallengedCell",
+                    for: indexPath
+                ) as? AcceptChallengedCell else {
+                    return UICollectionViewCell()
+                }
+                cell.didPressSurrenderButton = { [weak self] in
+                    self?.viewModel.hideAcceptChallengedView()
+                }
+                cell.didPressGetStartedButton = { [weak self] in
+                    self?.getTimerWorkout()
+                }
+                return cell
+
+            } else if isShowingActive {
+                // ActiveOpponentCell
+                guard let cell = collectionView.dequeueReusableCell(
+                    withReuseIdentifier: "ActiveOpponentCell",
+                    for: indexPath
+                ) as? ActiveOpponentCell else {
+                    return UICollectionViewCell()
+                }
+                cell.didPressAcceptButton = { [weak self] in
+                    self?.viewModel.showAcceptChallengedView()
+                }
+                cell.configure(getChallengedCount: 3, sendChallengedCount: 2)
+                return cell
+
+            } else {
+                // CompletedCell
+                guard let cell = collectionView.dequeueReusableCell(
+                    withReuseIdentifier: "CompletedCell",
+                    for: indexPath
+                ) as? CompletedCell else {
+                    return UICollectionViewCell()
+                }
+                // here you can configure CompletedCell for different indexPath.item (if needed)
+                return cell
             }
-            cell.didPressSurrenderButton = { [weak self] in
-//                self?.hideAcceptChallengedView()
-                self?.viewModel.hideAcceptChallengedView()
-            }
-            cell.didPressGetStartedButton = { [weak self] in
-                self?.getTimerWorkout()
-            }
-            return cell
-        } else if isShowingActive {
-            // Show ActiveOpponentCell
-            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ActiveOpponentCell", for: indexPath) as? ActiveOpponentCell else {
-                return UICollectionViewCell()
-            }
-            cell.didPressAcceptButton = { [weak self] in
-//                self?.showAcceptChallengedView()
-                self?.viewModel.showAcceptChallengedView()
-            }
-            return cell
-        } else {
-            // Show CompletedCell
-            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "CompletedCell", for: indexPath) as? CompletedCell else {
-                return UICollectionViewCell()
-            }
-            return cell
+
+        default:
+            return UICollectionViewCell()
         }
     }
 }

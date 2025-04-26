@@ -3,7 +3,7 @@
 import UIKit
 import SnapKit
 
-class GetChallengedUserView: UIView {
+class GetChallengedUserView: UICollectionViewCell {
 
     var didPressAcceptButton: (() -> Void)?
 
@@ -172,7 +172,6 @@ class GetChallengedUserView: UIView {
         }
 
         youBeenChallengedLabel.snp.remakeConstraints { make in
-//            make.centerY.equalTo(userViewBackground)
             make.top.equalTo(userRatingView.snp.bottom).offset(39 * Constraint.xCoeff)
             make.height.equalTo(36 * Constraint.yCoeff)
             make.leading.trailing.equalToSuperview().inset(20 * Constraint.xCoeff)
@@ -200,6 +199,7 @@ class GetChallengedUserView: UIView {
         }
     }
 
+    //TODO: add function
     @objc private func clickRefuseButton() {
 
     }

@@ -3,7 +3,7 @@
 import UIKit
 import SnapKit
 
-class SendChallengedUserView: UIView {
+class SendChallengedUserView: UICollectionViewCell {
 
     private lazy var userViewBackground: UIView = {
         let view = UIView(frame: .zero)
@@ -178,6 +178,7 @@ class SendChallengedUserView: UIView {
 
     }
 
+    //TODO: add function
     @objc func clickCancelButton() {
 
     }
