@@ -3,6 +3,18 @@
 import UIKit
 import SnapKit
 
+// Define the section and item identifiers
+enum CompetitionSection: Hashable {
+    case main
+}
+
+enum CompetitionItem: Hashable {
+    case acceptChallenge
+    case getChallenge(id: UUID)
+    case sendChallenge(id: UUID)
+    case completed(id: UUID)
+}
+
 class CompetitionController: UIViewController {
 
     private let viewModel = CompetitionViewModel()
@@ -14,8 +26,13 @@ class CompetitionController: UIViewController {
 
     private var countdownTimer: Timer?
 
-    private var getChallengedCount: Int = 5
-    private var sendChallengedCount: Int = 2
+    // Replace counters with item arrays
+    private var getChallengedItems: [CompetitionItem] = []
+    private var sendChallengedItems: [CompetitionItem] = []
+    private var completedItems: [CompetitionItem] = []
+
+    // Diffable data source property
+    private var dataSource: UICollectionViewDiffableDataSource<CompetitionSection, CompetitionItem>!
 
     private lazy var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
@@ -24,7 +41,7 @@ class CompetitionController: UIViewController {
         let view = UICollectionView(frame: .zero, collectionViewLayout: layout)
         view.backgroundColor = .clear
         view.showsVerticalScrollIndicator = false
-        view.dataSource = self
+        // No need to set dataSource - the diffable data source handles this
         view.delegate = self
         view.register(GetChallengedUserCell.self, forCellWithReuseIdentifier: "GetChallengedUserCell")
         view.register(SendChallengedUserCell.self, forCellWithReuseIdentifier: "SendChallengedUserCell")
@@ -65,16 +82,15 @@ class CompetitionController: UIViewController {
         return view
     }()
 
-
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .mainViewsBackgroundYellow
 
         setup()
         setupConstraint()
+        setupDataSource()
         setupBindings()
     }
-
 
     private func setup() {
         view.addSubview(competitionTopView)
@@ -99,20 +115,102 @@ class CompetitionController: UIViewController {
         }
 
         doNotHaveChallengesView.snp.remakeConstraints { make in
-            make.edges.equalToSuperview()
+            make.top.equalTo(competitionTopView.snp.bottom).offset(16 * Constraint.yCoeff)
+            make.leading.bottom.trailing.equalToSuperview()
         }
+    }
+
+    // Set up the diffable data source
+    private func setupDataSource() {
+        dataSource = UICollectionViewDiffableDataSource<CompetitionSection, CompetitionItem>(
+            collectionView: collectionView
+        ) { [weak self] (collectionView, indexPath, item) -> UICollectionViewCell? in
+            guard let self = self else { return nil }
+
+            switch item {
+            case .acceptChallenge:
+                guard let cell = collectionView.dequeueReusableCell(
+                    withReuseIdentifier: "AcceptChallengedCell",
+                    for: indexPath
+                ) as? AcceptChallengedCell else {
+                    return UICollectionViewCell()
+                }
+                cell.didPressSurrenderButton = { [weak self] in
+                    self?.viewModel.hideAcceptChallengedView()
+                }
+                cell.didPressGetStartedButton = { [weak self] in
+                    self?.getTimerWorkout()
+                }
+                return cell
+
+            case .getChallenge:
+                guard let cell = collectionView.dequeueReusableCell(
+                    withReuseIdentifier: "GetChallengedUserCell",
+                    for: indexPath
+                ) as? GetChallengedUserCell else {
+                    return UICollectionViewCell()
+                }
+                cell.didPressRefuseButton = { [weak self] in
+                    self?.handleAcceptGetChallenged(item: item)
+                }
+                cell.didPressAcceptButton = { [weak self] in
+                    self?.viewModel.showAcceptChallengedView()
+                }
+                return cell
+
+            case .sendChallenge:
+                guard let cell = collectionView.dequeueReusableCell(
+                    withReuseIdentifier: "SendChallengedUserCell",
+                    for: indexPath
+                ) as? SendChallengedUserCell else {
+                    return UICollectionViewCell()
+                }
+                cell.didPressCancelButton = { [weak self] in
+                    self?.handleCancelSendChallenged(item: item)
+                }
+                return cell
+
+            case .completed:
+                guard let cell = collectionView.dequeueReusableCell(
+                    withReuseIdentifier: "CompletedCell",
+                    for: indexPath
+                ) as? CompletedCell else {
+                    return UICollectionViewCell()
+                }
+                return cell
+            }
+        }
+
+        // Initialize with data
+        for _ in 0..<1 {
+            getChallengedItems.append(.getChallenge(id: UUID()))
+        }
+
+        for _ in 0..<2 {
+            sendChallengedItems.append(.sendChallenge(id: UUID()))
+        }
+
+        for _ in 0..<5 {
+            completedItems.append(.completed(id: UUID()))
+        }
+
+        updateUI()
     }
 
     func setupBindings() {
         viewModel.onActiveOpponentButton = { [weak self] in
             self?.isShowingActive = true
             self?.isAcceptChallengedViewVisible = false
+            self?.doNotHaveChallengesView.isHidden = true
+            self?.collectionView.isHidden = false
             self?.updateUI()
         }
 
         viewModel.onCompletedButton = { [weak self] in
             self?.isShowingActive = false
             self?.isAcceptChallengedViewVisible = false
+            self?.doNotHaveChallengesView.isHidden = true
+            self?.collectionView.isHidden = false
             self?.updateUI()
         }
 
@@ -123,6 +221,8 @@ class CompetitionController: UIViewController {
 
         viewModel.onShowAcceptChallengedView = { [weak self] in
             self?.isAcceptChallengedViewVisible = true
+            self?.doNotHaveChallengesView.isHidden = true
+            self?.collectionView.isHidden = false
             self?.updateUI()
         }
 
@@ -131,9 +231,24 @@ class CompetitionController: UIViewController {
         }
     }
 
+    // Update UI using diffable data source
     private func updateUI() {
         viewModel.updateButtonStyles(competitionTopView: competitionTopView)
-        collectionView.reloadData()
+
+        var snapshot = NSDiffableDataSourceSnapshot<CompetitionSection, CompetitionItem>()
+        snapshot.appendSections([.main])
+
+        if isAcceptChallengedViewVisible {
+            snapshot.appendItems([.acceptChallenge], toSection: .main)
+        } else if isShowingActive {
+            // Combine the get and send challenged items
+            let items = getChallengedItems + sendChallengedItems
+            snapshot.appendItems(items, toSection: .main)
+        } else {
+            snapshot.appendItems(completedItems, toSection: .main)
+        }
+
+        dataSource.apply(snapshot, animatingDifferences: true)
     }
 
     private func handleStartWorkout(with workout: TrainingModelCS) {
@@ -144,14 +259,15 @@ class CompetitionController: UIViewController {
         startCountdownTimer(with: duration, workoutTitle: workout.title)
     }
 
-
-    //TODO: finish mvvm pattern
+    // Updated to work with diffable data source
     private func getTimerWorkout() {
-        activeWorkoutCell = collectionView.cellForItem(at: IndexPath(item: 0, section: 0)) as? AcceptChallengedCell
-        timerView.isHidden = false
-        tabBarController?.tabBar.isHidden = true
-        if let acceptCell = activeWorkoutCell as? AcceptChallengedCell {
-            let workoutTitle = acceptCell.workoutTitle.text ?? "Workout"
+        // Get the first visible cell if it's an AcceptChallengedCell
+        if let cell = collectionView.visibleCells.first as? AcceptChallengedCell {
+            activeWorkoutCell = cell
+            timerView.isHidden = false
+            tabBarController?.tabBar.isHidden = true
+
+            let workoutTitle = cell.workoutTitle.text ?? "Workout"
             if let selectedWorkout = workouts.first(where: { $0.title == workoutTitle }) {
                 let duration = selectedWorkout.duration
                 timerView.workoutTitle.text = workoutTitle
@@ -261,71 +377,76 @@ class CompetitionController: UIViewController {
             acceptCell.loadRandomWorkout()
         }
     }
+
+    // Updated to work with diffable data source items instead of index paths
+    private func handleCancelSendChallenged(item: CompetitionItem) {
+        guard case .sendChallenge = item, !sendChallengedItems.isEmpty else { return }
+
+        // Remove the item from the array
+        if let index = sendChallengedItems.firstIndex(where: { $0 == item }) {
+            sendChallengedItems.remove(at: index)
+        }
+
+        // Check if this is the last item
+        let isLastItem = getChallengedItems.isEmpty && sendChallengedItems.isEmpty
+
+        if isLastItem {
+            // If it's the last item, show the empty state
+            self.isShowingActive = false
+            self.doNotHaveChallengesView.isHidden = false
+            self.collectionView.isHidden = true
+        }
+
+        // Update the UI to reflect changes
+        updateUI()
+    }
+
+    // Updated to work with diffable data source items instead of index paths
+    private func handleAcceptGetChallenged(item: CompetitionItem) {
+        guard case .getChallenge = item, !getChallengedItems.isEmpty else { return }
+
+        // Remove the item from the array
+        if let index = getChallengedItems.firstIndex(where: { $0 == item }) {
+            getChallengedItems.remove(at: index)
+        }
+
+        // Check if this is the last item
+        let isLastItem = getChallengedItems.isEmpty && sendChallengedItems.isEmpty
+
+        if isLastItem {
+            // If it's the last item, show the empty state
+            self.isShowingActive = false
+            self.doNotHaveChallengesView.isHidden = false
+            self.collectionView.isHidden = true
+        }
+
+        // Update the UI to reflect changes
+        updateUI()
+    }
 }
 
-extension CompetitionController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
-
-    func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return 1
-    }
-
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        if isAcceptChallengedViewVisible {
-            return 1
-        } else if isShowingActive {
-            return getChallengedCount + sendChallengedCount
-        } else {
-            return 3
-        }
-    }
-
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        if isAcceptChallengedViewVisible {
-            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "AcceptChallengedCell", for: indexPath) as? AcceptChallengedCell else {
-                return UICollectionViewCell()
-            }
-            cell.didPressSurrenderButton = { [weak self] in
-                self?.viewModel.hideAcceptChallengedView()
-            }
-            cell.didPressGetStartedButton = { [weak self] in
-                self?.getTimerWorkout()
-            }
-            return cell
-        } else if isShowingActive {
-            if indexPath.item < getChallengedCount {
-                guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "GetChallengedUserCell", for: indexPath) as? GetChallengedUserCell else {
-                    return UICollectionViewCell()
-                }
-                cell.didPressAcceptButton = { [weak self] in
-                    self?.viewModel.showAcceptChallengedView()
-                }
-                return cell
-            } else {
-                guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "SendChallengedUserCell", for: indexPath) as? SendChallengedUserCell else {
-                    return UICollectionViewCell()
-                }
-                return cell
-            }
-        } else {
-            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "CompletedCell", for: indexPath) as? CompletedCell else {
-                return UICollectionViewCell()
-            }
-            return cell
-        }
-    }
-
+// Keep only the delegate methods we need, no need for UICollectionViewDataSource anymore
+extension CompetitionController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        if isAcceptChallengedViewVisible {
-            return CGSize(width: collectionView.frame.width, height: collectionView.frame.height)
-        } else if isShowingActive {
+        let item = dataSource.itemIdentifier(for: indexPath)
+
+        switch item {
+        case .acceptChallenge:
+            return CGSize(width: collectionView.frame.width, height: 800 * Constraint.yCoeff)
+        case .getChallenge, .sendChallenge:
             return CGSize(width: collectionView.frame.width, height: 410 * Constraint.yCoeff)
-        } else {
+        case .completed:
+            return CGSize(width: collectionView.frame.width, height: 410 * Constraint.yCoeff)
+        case .none:
             return CGSize(width: collectionView.frame.width, height: 410 * Constraint.yCoeff)
         }
     }
 }
 
 
+//
+//import UIKit
+//import SnapKit
 //
 //class CompetitionController: UIViewController {
 //
@@ -338,17 +459,20 @@ extension CompetitionController: UICollectionViewDelegate, UICollectionViewDataS
 //
 //    private var countdownTimer: Timer?
 //
+//    private var getChallengedCount: Int = 2
+//    private var sendChallengedCount: Int = 2
+//
 //    private lazy var collectionView: UICollectionView = {
 //        let layout = UICollectionViewFlowLayout()
 //        layout.scrollDirection = .vertical
-//        layout.itemSize = CGSize(width: view.frame.width, height: view.frame.height)
-//        layout.minimumLineSpacing = 4
+//        layout.minimumLineSpacing = 16
 //        let view = UICollectionView(frame: .zero, collectionViewLayout: layout)
 //        view.backgroundColor = .clear
 //        view.showsVerticalScrollIndicator = false
 //        view.dataSource = self
 //        view.delegate = self
-//        view.register(ActiveOpponentCell.self, forCellWithReuseIdentifier: "ActiveOpponentCell")
+//        view.register(GetChallengedUserCell.self, forCellWithReuseIdentifier: "GetChallengedUserCell")
+//        view.register(SendChallengedUserCell.self, forCellWithReuseIdentifier: "SendChallengedUserCell")
 //        view.register(CompletedCell.self, forCellWithReuseIdentifier: "CompletedCell")
 //        view.register(AcceptChallengedCell.self, forCellWithReuseIdentifier: "AcceptChallengedCell")
 //        return view
@@ -451,6 +575,40 @@ extension CompetitionController: UICollectionViewDelegate, UICollectionViewDataS
 //            self?.handleStartWorkout(with: selectedWorkout)
 //        }
 //    }
+//
+////    func setupBindings() {
+////        viewModel.onActiveOpponentButton = { [weak self] in
+////            self?.isShowingActive = true
+////            self?.isAcceptChallengedViewVisible = false
+////            self?.doNotHaveChallengesView.isHidden = true
+////            self?.collectionView.isHidden = false
+////            self?.updateUI()
+////        }
+////
+////        viewModel.onCompletedButton = { [weak self] in
+////            self?.isShowingActive = false
+////            self?.isAcceptChallengedViewVisible = false
+////            self?.doNotHaveChallengesView.isHidden = true
+////            self?.collectionView.isHidden = false
+////            self?.updateUI()
+////        }
+////
+////        viewModel.onHideAcceptChallengedView = { [weak self] in
+////            self?.isAcceptChallengedViewVisible = false
+////            self?.updateUI()
+////        }
+////
+////        viewModel.onShowAcceptChallengedView = { [weak self] in
+////            self?.isAcceptChallengedViewVisible = true
+////            self?.doNotHaveChallengesView.isHidden = true
+////            self?.collectionView.isHidden = false
+////            self?.updateUI()
+////        }
+////
+////        viewModel.onStartTimerForWorkout = { [weak self] selectedWorkout in
+////            self?.handleStartWorkout(with: selectedWorkout)
+////        }
+////    }
 //
 //    private func updateUI() {
 //        viewModel.updateButtonStyles(competitionTopView: competitionTopView)
@@ -582,75 +740,115 @@ extension CompetitionController: UICollectionViewDelegate, UICollectionViewDataS
 //            acceptCell.loadRandomWorkout()
 //        }
 //    }
+//
+//    //TODO: delete current view
+//    private func handleCancelSendChallenged(at indexPath: IndexPath) {
+//        guard sendChallengedCount > 0 else { return }
+//
+//        let indexPathToDelete = indexPath
+//
+//        sendChallengedCount -= 1
+//
+//        let isLastItem = (getChallengedCount == 0 && sendChallengedCount == 0)
+//
+//        if isLastItem {
+//            self.isShowingActive = false
+//            self.doNotHaveChallengesView.isHidden = false
+//            self.collectionView.isHidden = true
+//            self.updateUI()
+//        } else {
+//            collectionView.performBatchUpdates({
+//                collectionView.deleteItems(at: [indexPathToDelete])
+//            }, completion: nil)
+//        }
+//    }
+//
+//    //TODO: delete current view
+//    private func handleAcceptGetChallenged(at indexPath: IndexPath) {
+//        guard getChallengedCount > 0 else { return }
+//
+//        let indexPathToDelete = indexPath
+//        getChallengedCount -= 1
+//
+//        let isLastItem = (getChallengedCount == 0 && sendChallengedCount == 0)
+//
+//        if isLastItem {
+//            self.isShowingActive = false
+//            self.doNotHaveChallengesView.isHidden = false
+//            self.collectionView.isHidden = true
+//            self.updateUI()
+//        } else {
+//            collectionView.performBatchUpdates({
+//                collectionView.deleteItems(at: [indexPathToDelete])
+//            }, completion: nil)
+//        }
+//    }
 //}
 //
-//extension CompetitionController: UICollectionViewDelegate, UICollectionViewDataSource {
+//extension CompetitionController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+//
 //    func numberOfSections(in collectionView: UICollectionView) -> Int {
 //        return 1
 //    }
 //
 //    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-//        switch section {
-//        case 0:
-//            if isAcceptChallengedViewVisible {
-//                return 1
-//            } else if isShowingActive {
-//                return 1
-//            } else {
-//                return 3
-//            }
-//        default:
-//            return 0
+//        if isAcceptChallengedViewVisible {
+//            return 1
+//        } else if isShowingActive {
+//            return getChallengedCount + sendChallengedCount
+//        } else {
+//            return 5
 //        }
 //    }
 //
 //    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-//        switch indexPath.section {
-//        case 0:
-//            if isAcceptChallengedViewVisible {
-//                // AcceptChallengedCell
-//                guard let cell = collectionView.dequeueReusableCell(
-//                    withReuseIdentifier: "AcceptChallengedCell",
-//                    for: indexPath
-//                ) as? AcceptChallengedCell else {
+//        if isAcceptChallengedViewVisible {
+//            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "AcceptChallengedCell", for: indexPath) as? AcceptChallengedCell else {
+//                return UICollectionViewCell()
+//            }
+//            cell.didPressSurrenderButton = { [weak self] in
+//                self?.viewModel.hideAcceptChallengedView()
+//            }
+//            cell.didPressGetStartedButton = { [weak self] in
+//                self?.getTimerWorkout()
+//            }
+//            return cell
+//        } else if isShowingActive {
+//            if indexPath.item < getChallengedCount {
+//                guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "GetChallengedUserCell", for: indexPath) as? GetChallengedUserCell else {
 //                    return UICollectionViewCell()
 //                }
-//                cell.didPressSurrenderButton = { [weak self] in
-//                    self?.viewModel.hideAcceptChallengedView()
-//                }
-//                cell.didPressGetStartedButton = { [weak self] in
-//                    self?.getTimerWorkout()
-//                }
-//                return cell
-//
-//            } else if isShowingActive {
-//                // ActiveOpponentCell
-//                guard let cell = collectionView.dequeueReusableCell(
-//                    withReuseIdentifier: "ActiveOpponentCell",
-//                    for: indexPath
-//                ) as? ActiveOpponentCell else {
-//                    return UICollectionViewCell()
+//                cell.didPressRefuseButton = { [weak self] in
+//                    self?.handleAcceptGetChallenged(at: indexPath)
 //                }
 //                cell.didPressAcceptButton = { [weak self] in
 //                    self?.viewModel.showAcceptChallengedView()
 //                }
-//                cell.configure(getChallengedCount: 3, sendChallengedCount: 2)
 //                return cell
-//
 //            } else {
-//                // CompletedCell
-//                guard let cell = collectionView.dequeueReusableCell(
-//                    withReuseIdentifier: "CompletedCell",
-//                    for: indexPath
-//                ) as? CompletedCell else {
+//                guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "SendChallengedUserCell", for: indexPath) as? SendChallengedUserCell else {
 //                    return UICollectionViewCell()
 //                }
-//                // here you can configure CompletedCell for different indexPath.item (if needed)
+//                cell.didPressCancelButton = { [weak self] in
+//                    self?.handleCancelSendChallenged(at: indexPath)
+//                }
 //                return cell
 //            }
+//        } else {
+//            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "CompletedCell", for: indexPath) as? CompletedCell else {
+//                return UICollectionViewCell()
+//            }
+//            return cell
+//        }
+//    }
 //
-//        default:
-//            return UICollectionViewCell()
+//    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+//        if isAcceptChallengedViewVisible {
+//            return CGSize(width: collectionView.frame.width, height: 800 * Constraint.yCoeff)
+//        } else if isShowingActive {
+//            return CGSize(width: collectionView.frame.width, height: 410 * Constraint.yCoeff)
+//        } else {
+//            return CGSize(width: collectionView.frame.width, height: 410 * Constraint.yCoeff)
 //        }
 //    }
 //}

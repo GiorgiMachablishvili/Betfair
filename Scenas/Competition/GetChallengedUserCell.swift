@@ -5,6 +5,7 @@ import SnapKit
 
 class GetChallengedUserCell: UICollectionViewCell {
 
+    var didPressRefuseButton: (() -> Void)?
     var didPressAcceptButton: (() -> Void)?
 
     private lazy var userViewBackground: UIView = {
@@ -201,7 +202,7 @@ class GetChallengedUserCell: UICollectionViewCell {
 
     //TODO: add function
     @objc private func clickRefuseButton() {
-
+        didPressRefuseButton?()
     }
 
     @objc private func clickAcceptButton() {

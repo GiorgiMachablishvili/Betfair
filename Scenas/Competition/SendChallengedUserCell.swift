@@ -5,6 +5,8 @@ import SnapKit
 
 class SendChallengedUserCell: UICollectionViewCell {
 
+    var didPressCancelButton: (() -> Void)?
+
     private lazy var userViewBackground: UIView = {
         let view = UIView(frame: .zero)
         view.backgroundColor = .whiteColor
@@ -180,6 +182,6 @@ class SendChallengedUserCell: UICollectionViewCell {
 
     //TODO: add function
     @objc func clickCancelButton() {
-
+        didPressCancelButton?()
     }
 }
