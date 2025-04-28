@@ -26,6 +26,10 @@ class CompetitionController: UIViewController {
 
     private var countdownTimer: Timer?
 
+    private var getChallengedCountdown: Int = 3
+    private var sendChallengedCountdown: Int = 2
+    private var completedCountdown: Int = 5
+
     // Replace counters with item arrays
     private var getChallengedItems: [CompetitionItem] = []
     private var sendChallengedItems: [CompetitionItem] = []
@@ -182,15 +186,15 @@ class CompetitionController: UIViewController {
         }
 
         // Initialize with data
-        for _ in 0..<1 {
+        for _ in 0..<getChallengedCountdown {
             getChallengedItems.append(.getChallenge(id: UUID()))
         }
 
-        for _ in 0..<2 {
+        for _ in 0..<sendChallengedCountdown {
             sendChallengedItems.append(.sendChallenge(id: UUID()))
         }
 
-        for _ in 0..<5 {
+        for _ in 0..<completedCountdown {
             completedItems.append(.completed(id: UUID()))
         }
 
