@@ -52,8 +52,8 @@ class ActiveOpponentCell: UICollectionViewCell {
     }
 
     func setupHierarchy() {
-        collectionView.register(GetChallengedUserView.self, forCellWithReuseIdentifier: String(describing: GetChallengedUserView.self))
-        collectionView.register(SendChallengedUserView.self, forCellWithReuseIdentifier: String(describing: SendChallengedUserView.self))
+        collectionView.register(GetChallengedUserCell.self, forCellWithReuseIdentifier: String(describing: GetChallengedUserCell.self))
+        collectionView.register(SendChallengedUserCell.self, forCellWithReuseIdentifier: String(describing: SendChallengedUserCell.self))
     }
 }
 
@@ -164,7 +164,7 @@ extension ActiveOpponentCell: UICollectionViewDelegate, UICollectionViewDataSour
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if indexPath.section == 0 {
-            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: String(describing: GetChallengedUserView.self), for: indexPath) as? GetChallengedUserView else {
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: String(describing: GetChallengedUserCell.self), for: indexPath) as? GetChallengedUserCell else {
                 return UICollectionViewCell()
             }
             cell.didPressAcceptButton = { [weak self] in
@@ -172,7 +172,7 @@ extension ActiveOpponentCell: UICollectionViewDelegate, UICollectionViewDataSour
             }
             return cell
         } else {
-            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: String(describing: SendChallengedUserView.self), for: indexPath) as? SendChallengedUserView else {
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: String(describing: SendChallengedUserCell.self), for: indexPath) as? SendChallengedUserCell else {
                 return UICollectionViewCell()
             }
             return cell

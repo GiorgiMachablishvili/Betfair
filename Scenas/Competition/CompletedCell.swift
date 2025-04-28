@@ -251,6 +251,7 @@ class CompletedCell: UICollectionViewCell {
         }
     }
 
+    //TODO: add func
     @objc private func clickRevancheButton() {
 
     }
