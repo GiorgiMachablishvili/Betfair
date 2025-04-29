@@ -2,6 +2,18 @@
 
 import UIKit
 
+// Define the section and item identifiers
+enum CompetitionSection: Hashable {
+    case main
+}
+
+enum CompetitionItem: Hashable {
+    case acceptChallenge
+    case getChallenge(id: UUID)
+    case sendChallenge(id: UUID)
+    case completed(id: UUID)
+}
+
 class CompetitionViewModel {
 
     var onActiveOpponentButton: (() -> Void)?

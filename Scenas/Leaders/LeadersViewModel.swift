@@ -46,7 +46,7 @@ class LeadersViewModel {
     func closeComplaintView() {
         onCloseComplaintView?()
     }
+    //TODO: Handle complaint confirmation logic
     func confirmButton() {
-        /* TODO: Handle complaint confirmation logic */
     }
 }
