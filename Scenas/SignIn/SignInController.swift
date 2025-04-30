@@ -18,7 +18,7 @@ class SignInController: UIViewController {
 
     private lazy var signInImage: UIImageView = {
         let view = UIImageView(frame: .zero)
-        view.image = UIImage(named: "beforeStartImage")
+        view.image = UIImage(named: "mainScreenImage")
         view.contentMode = .scaleAspectFit
         return view
     }()
