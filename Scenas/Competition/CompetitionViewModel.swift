@@ -15,7 +15,6 @@ enum CompetitionItem: Hashable {
 }
 
 class CompetitionViewModel {
-
     var onActiveOpponentButton: (() -> Void)?
     var onCompletedButton: (() -> Void)?
     var onHideAcceptChallengedView: (() -> Void)?
